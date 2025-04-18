@@ -4,13 +4,14 @@ import sequelize from "./index";
 export class Unit extends Model {
     public id!: number;
     public name!: string;
+    public symbol!:string;
+
 }
 Unit.init(
     {
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-        name: { type: DataTypes.STRING, allowNull: false },
-        note: {type:DataTypes.STRING, allowNull:false},
-        symbol:{type:DataTypes.STRING, allowNull:false}
+        name: { type: DataTypes.STRING(60), allowNull: false, unique:true },
+        symbol:{type:DataTypes.STRING(10), allowNull:false, unique:true}
     },
     { sequelize, modelName: "unit" }
 );
@@ -19,13 +20,14 @@ export class Product extends Model{
     public id!: number;
     public unitId!:number;
     public name!:string;
-    public note!:string;
+    public note?:string;
 }
 
 Product.init({
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: DataTypes.STRING, allowNull: false },
         unitId: { type: DataTypes.INTEGER, references: { model: Unit, key: "id" } },
+        note: { type: DataTypes.STRING, allowNull: true },
     },
     {sequelize, modelName:"product"}
 )
@@ -33,37 +35,37 @@ Product.init({
 export class Applicant extends Model{
     public id!: number;
     public name!:string;
-    public email!:string;
-    public phone!:string;
-    public address!:string;
-    public note!:string;
+    public email?:string;
+    public phone?:string;
+    public address?:string;
+    public note?:string;
 }
 Applicant.init({
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
-        email: {type:DataTypes.STRING, allowNull:false},
-        phone:{type:DataTypes.STRING, allowNull:false},
-        address:{type:DataTypes.STRING, allowNull:false},
-        note:{type:DataTypes.STRING, allowNull:false},
+        email: {type:DataTypes.STRING, allowNull:true},
+        phone:{type:DataTypes.STRING, allowNull:true},
+        address:{type:DataTypes.STRING, allowNull:true},
+        note:{type:DataTypes.STRING, allowNull:true},
 },
     {sequelize, modelName:"applicant"}
     )
 export class Purchaser extends Model{
     public id!: number;
     public name!:string;
-    public email!:string;
-    public phone!:string;
-    public address!:string;
-    public note!:string;
+    public email?:string;
+    public phone?:string;
+    public address?:string;
+    public note?:string;
 }
 
 Purchaser.init({
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: DataTypes.STRING, allowNull: false },
-        email: {type:DataTypes.STRING, allowNull:false},
-        phone:{type:DataTypes.STRING, allowNull:false},
-        address:{type:DataTypes.STRING, allowNull:false},
-        note:{type:DataTypes.STRING, allowNull:false},
+        email: {type:DataTypes.STRING, allowNull:true},
+        phone:{type:DataTypes.STRING, allowNull:true},
+        address:{type:DataTypes.STRING, allowNull:true},
+        note:{type:DataTypes.STRING, allowNull:true},
     },
     {sequelize, modelName:"purchaser"}
 )
@@ -72,19 +74,18 @@ Purchaser.init({
 export class Company extends Model{
     public id!: number;
     public name!:string;
-    public email!:string;
-    public phone!:string;
-    public address!:string;
-    public note!:string;
+    public email?:string;
+    public phone?:string;
+    public address?:string;
+    public note?:string;
 }
-
 Company.init({
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: DataTypes.STRING, allowNull: false },
-        email: {type:DataTypes.STRING, allowNull:false},
-        phone:{type:DataTypes.STRING, allowNull:false},
-        address:{type:DataTypes.STRING, allowNull:false},
-        note:{type:DataTypes.STRING, allowNull:false},
+        email: {type:DataTypes.STRING, allowNull:true},
+        phone:{type:DataTypes.STRING, allowNull:true},
+        address:{type:DataTypes.STRING, allowNull:true},
+        note:{type:DataTypes.STRING, allowNull:true},
     },
     {sequelize, modelName:"company"}
 )
@@ -95,7 +96,6 @@ export class Currency extends Model{
     public code!:number;
     public symbol!:boolean;
 }
-
 Currency.init({
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: DataTypes.STRING, allowNull: false },
@@ -107,7 +107,6 @@ Currency.init({
 )
 
 
-
 export class Project extends Model{
     public id!: number;
     public name!:string;
@@ -117,7 +116,6 @@ export class Project extends Model{
     public status!:boolean;
     public currencyId!:number
 }
-
 Project.init({
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: DataTypes.STRING, allowNull: false },
@@ -137,7 +135,6 @@ export class AccessLink extends Model{
     public projectId!:number;
     public status!:boolean;
 }
-
 AccessLink.init({
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: DataTypes.STRING, allowNull: false },
@@ -152,47 +149,55 @@ export class Contract extends Model{
     public id!: number;
     public type!:"product" | "service";
     public name!:string;
-    public note!:boolean;
     public projectId!:number;
     public applicantId!:number;
     public purchaserId!:number;
     public companyId!:number;
     public amount!:number;
-    public giveAmount!:number;
     public currencyId!:number;
-    public transferCurrencyId!:number;
-    public transferCurrencyExchangeRate!:number;
-    public projectCurrencyExchangeRate!:number;
     public signDate!:Date;
     public officialBeginDate!:Date;
     public officialFinishDate!:Date;
-    public finishDate!:Date;
     public status!:boolean;
 
-    public readonly baseCurrencyContracts?: Currency;
-    public readonly transferCurrencyContracts?: Currency;
+    // public readonly baseCurrencyContracts?: Currency;
+    // public readonly transferCurrencyContracts?: Currency;
+
+    public finishDate?:Date;
+    public transferCurrencyId?:number;
+    public transferCurrencyExchangeRate?:number;
+    public projectCurrencyExchangeRate?:number;
+    public giveAmount?:number;
+    public fileLink?:string;
+    public file?:string;
+    public note?:boolean;
+
 }
 
 Contract.init({
         id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
         name: { type: DataTypes.STRING, allowNull: false },
-        note: { type: DataTypes.STRING, allowNull: false },
         type: { type: DataTypes.ENUM("product", "service"), allowNull: false },
         projectId:{type:DataTypes.INTEGER, references:{model:Project, key:"id"}, allowNull:false},
         applicantId:{type:DataTypes.INTEGER, references:{model:Applicant, key:"id"}, allowNull:false},
         purchaserId:{type:DataTypes.INTEGER, references:{model:Purchaser, key:"id"}, allowNull:false},
         companyId:{type:DataTypes.INTEGER, references:{model:Company, key:"id"}, allowNull:false},
         amount: { type: DataTypes.DECIMAL(19, 6), allowNull: false },
-        giveAmount: { type: DataTypes.DECIMAL(19, 6), allowNull: false },
         currencyId:{type:DataTypes.INTEGER, references:{model:Currency, key:"id"}, allowNull:false},
-        transferCurrencyId:{type:DataTypes.INTEGER, references:{model:Currency, key:"id"}, allowNull:false},
-        transferCurrencyExchangeRate: { type: DataTypes.DECIMAL(11, 6), allowNull: false },
-        projectCurrencyExchangeRate: { type: DataTypes.DECIMAL(11, 6), allowNull: false },
+
         signDate: {type:DataTypes.DATE, allowNull:false},
         officialBeginDate: {type:DataTypes.DATE, allowNull:false},
         officialFinishDate: {type:DataTypes.DATE, allowNull:false},
-        finishDate: {type:DataTypes.DATE, allowNull:false},
         status:{type:DataTypes.BOOLEAN, allowNull:false, defaultValue:false},
+        projectCurrencyExchangeRate: { type: DataTypes.DECIMAL(11, 6), allowNull: false },
+
+
+        giveAmount: { type: DataTypes.DECIMAL(19, 6), allowNull: false, defaultValue:0 },
+        transferCurrencyId:{type:DataTypes.INTEGER, references:{model:Currency, key:"id"}, allowNull:true},
+        transferCurrencyExchangeRate: { type: DataTypes.DECIMAL(11, 6), allowNull: true },
+        note: { type: DataTypes.STRING, allowNull: true },
+        finishDate: {type:DataTypes.DATE, allowNull:true},
+
     },
     {sequelize, modelName:"contract"}
 )
@@ -205,6 +210,7 @@ export class ProductInventory extends Model{
     public contractQuantity!:number;
     public takeQuantity!:number;
     public giveQuantity!:number;
+    public contract?:Contract
 
 }
 
