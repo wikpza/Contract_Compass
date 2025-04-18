@@ -12,6 +12,7 @@ import {FormErrors, isFormErrors} from "@/lib/errors";
 import {toast} from "sonner";
 import {CreateApplicantType, GetApplicantType, UpdateApplicantType} from "@/types/Applicant.ts";
 import {Textarea} from "@/components/ui/textarea.tsx";
+import {CreateCompanyType, GetCompanyType, UpdateCompanyType} from "@/types/Company.ts";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -31,15 +32,15 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface FormProps {
-  data?: GetApplicantType;
-  onCreate?: (input: CreateApplicantType) => void;
-  onUpdate?: (input :UpdateApplicantType) => void;
+  data?: GetCompanyType;
+  onCreate?: (input: CreateCompanyType) => void;
+  onUpdate?: (input :UpdateCompanyType) => void;
   response: FormErrors | {message:string} | undefined,
     onCancel:()=>void,
     status?:number
 }
 
-const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }: FormProps) => {
+const CompanyForm = ({ data, onCreate, onUpdate, response, onCancel, status }: FormProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,7 +53,7 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
     }
   });
 
-  const handleSubmit = (input: CreateApplicantType) => {
+  const handleSubmit = (input: CreateCompanyType) => {
 
     if(onCreate){
         onCreate(input)
@@ -165,7 +166,7 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
           </Button>
 
           <Button type="submit">
-            {onCreate ? 'Создать' : 'Обновить'} Заявителя
+            {onCreate ? 'Создать' : 'Обновить'} Компанию
           </Button>
         </div>
       </form>
@@ -173,4 +174,4 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
   );
 };
 
-export default ApplicantForm;
+export default CompanyForm;

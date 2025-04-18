@@ -40,15 +40,18 @@ import {GetApplicantType} from "@/types/Applicant.ts";
 import SearchPanel from "@/components/SearchPanel.tsx";
 import {useDeleteApplicant, useUpdateApplicant} from "@/api/Applicant.api.ts";
 import ApplicantForm from "@/components/Forms/ApplicantForm.tsx";
+import {GetPurchaserType} from "@/types/Purchaser.ts";
+import {useDeletePurchaser, useUpdatePurchaser} from "@/api/Purchaser.api.ts";
+import PurchaserForm from "@/components/Forms/PurchaserForm.tsx";
 
 type Props = {
     searchParams:SearchParams,
     setSearchParams: (input:SearchParams)=>void
-    data:{count:number, rows:GetApplicantType[]} | undefined,
+    data:{count:number, rows:GetPurchaserType[]} | undefined,
     refetch: ()=>void,
 }
 
-export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Props) {
+export function PurchaserTable({data, refetch, searchParams, setSearchParams}:Props) {
 
     const totalPages = Math.ceil(data?.count / searchParams.limit);
     const columns = [
@@ -59,8 +62,8 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
         {value:"phone", name:"Телефон"},
         {value:"createdAt", name:"Дата создания"}
     ]
-    const {update, isSuccess:isUpdateSuccess, response:updateResponse} = useUpdateApplicant()
-    const {deleteObj, data:deleteResponse, isSuccess:isDeleteSuccess} = useDeleteApplicant()
+    const {update, isSuccess:isUpdateSuccess, response:updateResponse} = useUpdatePurchaser()
+    const {deleteObj, data:deleteResponse, isSuccess:isDeleteSuccess} = useDeletePurchaser()
 
     const [openDialogId, setOpenDialogId] = useState<number | null>(null);
     const [openDeleteDialogId, setOpenDeleteDialogId] = useState<number | null>(null);
@@ -252,7 +255,7 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                             </DialogDescription>
                                                         </DialogHeader>
                                                         <div>
-                                                            <ApplicantForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} data={row}/>
+                                                            <PurchaserForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} data={row}/>
                                                         </div>
                                                     </DialogContent>
                                                 </Dialog>
@@ -281,7 +284,7 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                         <DialogHeader>
                                                             <DialogTitle>Единицы измерения</DialogTitle>
                                                             <DialogDescription>
-                                                                {`Вы уверены, что хотите удалить Единицу измерения ${row.name}?`}
+                                                                {`Вы уверены, что хотите удалить Заказчика ${row.name}?`}
                                                             </DialogDescription>
                                                         </DialogHeader>
 

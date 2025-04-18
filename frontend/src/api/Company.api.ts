@@ -3,14 +3,15 @@ import {toast} from "sonner";
 import {FormErrors, handleServerError, isFormErrors, isValidJSON} from "@/lib/errors";
 import {SearchParams} from "@/types";
 import {CreateApplicantType, GetApplicantType, UpdateApplicantType} from "@/types/Applicant.ts";
+import {CreateCompanyType, GetCompanyType, UpdateCompanyType} from "@/types/Company.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-export const useGetApplicants = (
+export const useGetCompany = (
     input: SearchParams
 ) => {
     const accessToken = localStorage.getItem('token');
 
-    const getRequest = async (): Promise<{data?: {count: number, rows: GetApplicantType[]}, status: number}> => {
+    const getRequest = async (): Promise<{data?: {count: number, rows: GetCompanyType[]}, status: number}> => {
         // Создаем объект URLSearchParams и добавляем параметры
         const params = new URLSearchParams();
 
@@ -38,7 +39,7 @@ export const useGetApplicants = (
             params.append('sortBy', input.sortBy);
         }
 
-        const url = `${API_BASE_URL}/applicant?${params.toString()}`;
+        const url = `${API_BASE_URL}/company?${params.toString()}`;
 
         const response = await fetch(url, {
             method: "GET",
@@ -60,7 +61,7 @@ export const useGetApplicants = (
     }
 
     const {data, isLoading, error, refetch} = useQuery(
-        ['fetchApplicant', input], // Ключ запроса теперь включает параметры
+        ['fetchCompany', input], // Ключ запроса теперь включает параметры
         getRequest,
         {retry: 1}
     );
@@ -68,17 +69,17 @@ export const useGetApplicants = (
     return {data, isLoading, error, refetch};
 }
 
-export const useCreateApplicant = ()=>{
+export const useCreateCompany = ()=>{
     const accessToken = localStorage.getItem('token');
 
-    const createRequest = async(input:CreateApplicantType):Promise<
+    const createRequest = async(input:CreateCompanyType):Promise<
         {
-            unit?:GetApplicantType,
+            unit?:GetCompanyType,
             response?: FormErrors | { message: string};
             status:number
         }>=>{
 
-        const inputData:CreateApplicantType = {name:""}
+        const inputData:CreateCompanyType = {name:""}
 
         if(input.name && input.name !== "") inputData.name = input.name
         if(input.address && input.address !== "") inputData.address = input.address
@@ -87,7 +88,7 @@ export const useCreateApplicant = ()=>{
         if(input.note && input.note !== "") inputData.note = input.note
 
 
-        const response = await fetch(`${API_BASE_URL}/applicant`,
+        const response = await fetch(`${API_BASE_URL}/company`,
             {
                 method:"POST",
                 headers:{
@@ -123,7 +124,7 @@ export const useCreateApplicant = ()=>{
         retry:0,
         onSuccess: (data) => {
             if(data?.status === 201)
-                toast.success("Заявитель успешно добавлен");
+                toast.success("Компания успешна добавлена");
         },
 
     })
@@ -131,16 +132,16 @@ export const useCreateApplicant = ()=>{
     return {create, isLoading, error, isSuccess, response:data}
 }
 
-export const useUpdateApplicant = ()=>{
+export const useUpdateCompany = ()=>{
     const accessToken = localStorage.getItem('token');
-    const updateUnitRequest = async(input:UpdateApplicantType):Promise<
+    const updateRequest = async(input:UpdateCompanyType):Promise<
         {
-            unit?:GetApplicantType,
+            unit?:GetCompanyType,
             response?: FormErrors | { message: string};
             status:number
         }>=>{
 
-        const response = await fetch(`${API_BASE_URL}/applicant/${input.id}`,
+        const response = await fetch(`${API_BASE_URL}/company/${input.id}`,
             {
                 method:"PATCH",
                 headers:{
@@ -172,30 +173,30 @@ export const useUpdateApplicant = ()=>{
         return { unit: responseData, status:response.status };
     }
 
-    const {mutate:update, isLoading, isSuccess, error, data} = useMutation(updateUnitRequest, {
+    const {mutate:update, isLoading, isSuccess, error, data} = useMutation(updateRequest, {
         retry:0,
         onSuccess: (data) => {
             if(data?.status >= 200 && data?.status < 300)
-                toast.success("Заявитель успешно обновлен");
+                toast.success("Компания успешна обновлена");
         },
     })
 
     return {update, isLoading, error, isSuccess, response:data}
 }
 
-export const useDeleteApplicant = ()=> {
+export const useDeleteCompany = ()=> {
     const accessToken = localStorage.getItem('token');
 
     const deleteRequest = async (id: number): Promise<
         {
-            unit?:GetApplicantType,
+            unit?:GetCompanyType,
             response?: FormErrors | { message: string};
             status:number
         }
     >=>{
 
 
-        const response = await fetch(`${API_BASE_URL}/applicant/${id}`,{
+        const response = await fetch(`${API_BASE_URL}/company/${id}`,{
             method:"DELETE",
             headers:{
                 'Content-Type': "application/json",
@@ -231,10 +232,10 @@ export const useDeleteApplicant = ()=> {
         error,
         isSuccess,
         data
-    } = useMutation("DeleteApplicant", deleteRequest, {
+    } = useMutation("DeleteCompany", deleteRequest, {
         retry:0,
         onSuccess: (data) => {
-            if(data && data.status && data?.status >= 200 && data?.status < 300) toast.success('Заявитель успешно удален');
+            if(data && data.status && data?.status >= 200 && data?.status < 300) toast.success('Компания успешна удалена');
             if(data && data.status && data?.status === 409) toast.error(data.response.message);
         },
 

@@ -1,17 +1,16 @@
 import {useMutation, useQuery} from "react-query";
-// import {CreateUnitType, GetUnit, Unit, UpdateUnitType} from "@/types/unit.ts";
 import {toast} from "sonner";
 import {FormErrors, handleServerError, isFormErrors, isValidJSON} from "@/lib/errors";
-import {CreateUnitType, GetUnitType, UpdateUnitType} from "@/types/Unit.ts";
 import {SearchParams} from "@/types";
+import {CreateApplicantType, GetApplicantType, UpdateApplicantType} from "@/types/Applicant.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-export const useGetUnits = (
+export const useGetApplicants = (
     input: SearchParams
 ) => {
     const accessToken = localStorage.getItem('token');
 
-    const getUnitsRequest = async (): Promise<{data?: {count: number, rows: GetUnitType[]}, status: number}> => {
+    const getRequest = async (): Promise<{data?: {count: number, rows: GetApplicantType[]}, status: number}> => {
         // Создаем объект URLSearchParams и добавляем параметры
         const params = new URLSearchParams();
 
@@ -39,7 +38,7 @@ export const useGetUnits = (
             params.append('sortBy', input.sortBy);
         }
 
-        const url = `${API_BASE_URL}/unit?${params.toString()}`;
+        const url = `${API_BASE_URL}/applicant?${params.toString()}`;
 
         const response = await fetch(url, {
             method: "GET",
@@ -61,34 +60,41 @@ export const useGetUnits = (
     }
 
     const {data, isLoading, error, refetch} = useQuery(
-        ['fetchUnits', input], // Ключ запроса теперь включает параметры
-        getUnitsRequest,
+        ['fetchApplicant', input], // Ключ запроса теперь включает параметры
+        getRequest,
         {retry: 1}
     );
 
     return {data, isLoading, error, refetch};
 }
 
-export const useCreateUnit = ()=>{
+export const useCreateApplicant = ()=>{
     const accessToken = localStorage.getItem('token');
 
-    const createUnitRequest = async(input:CreateUnitType):Promise<
+    const createRequest = async(input:CreateApplicantType):Promise<
         {
-            unit?:GetUnitType,
+            unit?:GetApplicantType,
             response?: FormErrors | { message: string};
             status:number
         }>=>{
 
+        const inputData:CreateApplicantType = {name:""}
 
-        const response = await fetch(`${API_BASE_URL}/unit`,
+        if(input.name && input.name !== "") inputData.name = input.name
+        if(input.address && input.address !== "") inputData.address = input.address
+        if(input.phone && input.phone !== "") inputData.phone = input.phone
+        if(input.email && input.email !== "") inputData.email = input.email
+        if(input.note && input.note !== "") inputData.note = input.note
+
+
+        const response = await fetch(`${API_BASE_URL}/applicant`,
             {
                 method:"POST",
                 headers:{
                     "Content-Type": "application/json",
                     Authorization:`Bearer ${accessToken}`,
-
                 },
-                body:JSON.stringify(input)
+                body:JSON.stringify(inputData)
             })
 
 
@@ -113,11 +119,11 @@ export const useCreateUnit = ()=>{
         return { unit: responseData, status:response.status };
     }
 
-    const {mutate:create, isLoading, isSuccess, error, data} = useMutation(createUnitRequest, {
+    const {mutate:create, isLoading, isSuccess, error, data} = useMutation(createRequest, {
         retry:0,
         onSuccess: (data) => {
             if(data?.status === 201)
-                toast.success("Единица измерения успешно добавлена");
+                toast.success("Заявитель успешно добавлен");
         },
 
     })
@@ -125,23 +131,23 @@ export const useCreateUnit = ()=>{
     return {create, isLoading, error, isSuccess, response:data}
 }
 
-export const useUpdateUnit = ()=>{
+export const useUpdateApplicant = ()=>{
     const accessToken = localStorage.getItem('token');
-    const updateUnitRequest = async(input:UpdateUnitType):Promise<
+    const updateUnitRequest = async(input:UpdateApplicantType):Promise<
         {
-            unit?:GetUnitType,
+            unit?:GetApplicantType,
             response?: FormErrors | { message: string};
             status:number
         }>=>{
 
-        const response = await fetch(`${API_BASE_URL}/unit/${input.id}`,
+        const response = await fetch(`${API_BASE_URL}/applicant/${input.id}`,
             {
                 method:"PATCH",
                 headers:{
                     "Content-Type": "application/json",
                     Authorization:`Bearer ${accessToken}`,
                 },
-                body:JSON.stringify({name:input.name, symbol:input.symbol})
+                body:JSON.stringify(input)
             })
 
 
@@ -170,26 +176,26 @@ export const useUpdateUnit = ()=>{
         retry:0,
         onSuccess: (data) => {
             if(data?.status >= 200 && data?.status < 300)
-                toast.success("Единица измерения успешно обновлена");
+                toast.success("Заявитель успешно обновлен");
         },
     })
 
     return {update, isLoading, error, isSuccess, response:data}
 }
 
-export const useDeleteUnit = ()=> {
+export const useDeleteApplicant = ()=> {
     const accessToken = localStorage.getItem('token');
 
-    const deleteProductRequest = async (id: number): Promise<
+    const deleteRequest = async (id: number): Promise<
         {
-            unit?:GetUnitType,
+            unit?:GetApplicantType,
             response?: FormErrors | { message: string};
             status:number
         }
     >=>{
 
 
-        const response = await fetch(`${API_BASE_URL}/unit/${id}`,{
+        const response = await fetch(`${API_BASE_URL}/applicant/${id}`,{
             method:"DELETE",
             headers:{
                 'Content-Type': "application/json",
@@ -225,10 +231,10 @@ export const useDeleteUnit = ()=> {
         error,
         isSuccess,
         data
-    } = useMutation("DeleteUnit", deleteProductRequest, {
+    } = useMutation("DeleteApplicant", deleteRequest, {
         retry:0,
         onSuccess: (data) => {
-            if(data && data.status && data?.status >= 200 && data?.status < 300) toast.success('Единица измерения успешно удалена');
+            if(data && data.status && data?.status >= 200 && data?.status < 300) toast.success('Заявитель успешно удален');
             if(data && data.status && data?.status === 409) toast.error(data.response.message);
         },
 

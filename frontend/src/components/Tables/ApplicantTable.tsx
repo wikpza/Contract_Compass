@@ -9,11 +9,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import {Eye, Edit, Trash, Plus, ArrowUp, ArrowDown, Search, PlusCircle} from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Edit, Trash, ArrowUp, ArrowDown} from 'lucide-react';
+import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import {
     Pagination,
     PaginationContent,
@@ -23,10 +20,8 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
-import {GetUnitType} from "@/types/Unit.ts";
-
 import {SearchParams} from "@/types";
-import {useDeleteUnit, useUpdateUnit} from "@/api/Unit.api.ts";
+
 import {
     Dialog,
     DialogContent,
@@ -36,20 +31,32 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog.tsx";
 import UnitForm from "@/components/Forms/UnitForm.tsx";
+import {GetApplicantType} from "@/types/Applicant.ts";
+import SearchPanel from "@/components/SearchPanel.tsx";
+import {useDeleteApplicant, useUpdateApplicant} from "@/api/Applicant.api.ts";
+import ApplicantForm from "@/components/Forms/ApplicantForm.tsx";
 
 type Props = {
     searchParams:SearchParams,
     setSearchParams: (input:SearchParams)=>void
-    data:{count:number, rows:GetUnitType[]} | undefined,
+    data:{count:number, rows:GetApplicantType[]} | undefined,
     refetch: ()=>void,
 }
 
-export function UnitTable({data, refetch, searchParams, setSearchParams}:Props) {
+export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Props) {
 
     const totalPages = Math.ceil(data?.count / searchParams.limit);
-    const columns = [{value:"name", name:"Название"}, {value:"symbol", name:"Символ"}, {value:"createdAt", name:"Дата создания"}]
-    const {update, isSuccess:isUpdateSuccess, response:updateResponse} = useUpdateUnit()
-    const {deleteObj, data:deleteResponse, isSuccess:isDeleteSuccess} = useDeleteUnit()
+    const columns = [
+        {value:"name", name:"Название"},
+        {value:"email", name:"Почта"},
+        {value:"address", name:"Адрес"},
+        {value:"note", name:"Заметка"},
+        {value:"phone", name:"Телефон"},
+        {value:"createdAt", name:"Дата создания"}
+    ]
+    const {update, isSuccess:isUpdateSuccess, response:updateResponse} = useUpdateApplicant()
+    const {deleteObj, data:deleteResponse, isSuccess:isDeleteSuccess} = useDeleteApplicant()
+
     const [openDialogId, setOpenDialogId] = useState<number | null>(null);
     const [openDeleteDialogId, setOpenDeleteDialogId] = useState<number | null>(null);
     const getPageLinks = () => {
@@ -131,266 +138,214 @@ export function UnitTable({data, refetch, searchParams, setSearchParams}:Props) 
 
     return (
         <div className="w-full">
+            <ScrollArea className=" w-full rounded-md border p-4">
+                <SearchPanel searchParams={searchParams} setSearchParams={setSearchParams} columns={columns}/>
 
-            {/* Search and Sort Panel */}
-            <div className="p-4 bg-muted/30 rounded-t-md border-b">
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex items-center gap-2 flex-grow">
-                        <Search className="h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search..."
-                            className="max-w-sm"
-                            value={searchParams.searchValue}
-                            onChange={(e) => setSearchParams({...searchParams, searchValue:e.target.value, page:1})}
-
-                            // onChange={(e) => setSearchParams({...searchParams, searchValue:e.target.value})}
-                        />
-                    </div>
-
-                    <div className="flex flex-wrap sm:flex-nowrap gap-2">
-                        <Select
-                            value={searchParams.searchBy || 'name'}
-                            onValueChange={(value) => setSearchParams({...searchParams, searchBy:value, page:1})}
-                        >
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Search by" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {columns.map((column) => (
-                                    <SelectItem
-                                        key={column.value}
-                                        value={column.value}>
-                                       {`Search by: ${column.name}`}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        <Select
-                            value={searchParams.sortBy || 'createdAt'}
-                            onValueChange={(value) => setSearchParams({...searchParams, sortBy: value || "createdAt",  page:1})}
-                        >
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Sort by" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {columns.map((column) => (
-                                    <SelectItem key={column.value} value={column.value}>
-                                        {`Sort by: ${column.name}`}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        <Select
-                            value={searchParams.sortType}
-                            onValueChange={(value) => setSearchParams({...searchParams, sortType:value as 'ASC' | 'DESC', page:1})}
-                            // disabled={!searchParams.sortType}
-                        >
-                            <SelectTrigger className="w-[120px]">
-                                <SelectValue>
-                                    {searchParams.sortType === 'ASC' ? 'Возрастанию' : 'Убыванию'}
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="ASC">Возрастанию</SelectItem>
-                                <SelectItem value="DESC">Убыванию</SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                    </div>
-                </div>
-            </div>
-
-            {data?<ScrollArea className="w-full overflow-auto">
-                <div className="min-w-max">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-
-                                {columns.map(column=>(
-                                    <TableHead
-                                        className={searchParams.sortBy === column.value ? 'cursor-pointer' : ''}
-                                        onClick={()=>{
-                                            if(searchParams.sortBy === column.value) setSearchParams( {...searchParams, sortType: (searchParams.sortType === 'ASC')?'DESC':'ASC'})
-                                            else setSearchParams({...searchParams, sortBy:column.value})
-                                        }}
-                                    >
-
-                                        <div className="flex items-center gap-1">
-                                            {column.name}
-                                            {searchParams.sortBy === column.value && (
-                                            searchParams.sortType === 'ASC'
-                                                ? <ArrowUp className="h-3 w-3"/>
-                                                : <ArrowDown className="h-3 w-3"/>
-                                        )}
-                                        </div>
-
-                                    </TableHead>
-                                ))}
-
-                                <TableHead className="text-right">Действие</TableHead>
-
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {data.rows.length === 0 ? (
+                {data?
+                    <div
+                        className="min-w-[300px]"
+                    >
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell
-                                        // colSpan={hideActions ? columns.length : columns.length + 1}
-                                        className="h-24 text-center"
-                                    >
-                                        {data.rows.length === 0
-                                            ? (searchParams.searchValue ? "No matching results found" : "No results found")
-                                            : "No data for this page"}
-                                    </TableCell>
+
+                                    <TableHead>ID</TableHead>
+
+                                    {columns.map(column=>(
+                                        <TableHead
+                                            className={searchParams.sortBy === column.value ? 'cursor-pointer' : ''}
+                                            onClick={()=>{
+                                                if(searchParams.sortBy === column.value) setSearchParams( {...searchParams, sortType: (searchParams.sortType === 'ASC')?'DESC':'ASC'})
+                                                else setSearchParams({...searchParams, sortBy:column.value})
+                                            }}
+                                        >
+
+                                            <div className="flex items-center gap-1">
+                                                {column.name}
+                                                {searchParams.sortBy === column.value && (
+                                                searchParams.sortType === 'ASC'
+                                                    ? <ArrowUp className="h-3 w-3"/>
+                                                    : <ArrowDown className="h-3 w-3"/>
+                                            )}
+                                            </div>
+
+                                        </TableHead>
+                                    ))}
+
+                                    <TableHead className="text-right">Действие</TableHead>
+
                                 </TableRow>
-                            ) : (
-                                data.rows.map((row, rowIndex) => (
-                                    <TableRow key={row.id || rowIndex}>
-
-                                        <TableCell >
-                                            {row.name}
+                            </TableHeader>
+                            <TableBody>
+                                {data.rows.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell
+                                            className="h-24 text-center"
+                                        >
+                                            {data.rows.length === 0
+                                                ? (searchParams.searchValue ? "No matching results found" : "No results found")
+                                                : "No data for this page"}
                                         </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    data.rows.map((row, rowIndex) => (
+                                        <TableRow key={row.id || rowIndex}>
 
-                                        <TableCell >
-                                            {row.symbol}
-                                        </TableCell>
+                                            <TableCell >
+                                                {row.id}
+                                            </TableCell>
 
-                                        <TableCell >
-                                            {row.createdAt.toString()}
-                                        </TableCell>
+                                            <TableCell >
+                                                {row.name}
+                                            </TableCell>
 
+                                            <TableCell >
+                                                {row.email || 'not email'}
+                                            </TableCell>
 
+                                            <TableCell >
+                                                {row.address || "not address"}
+                                            </TableCell>
 
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end space-x-2">
+                                            <TableCell >
+                                                {row.note || 'not note'}
+                                            </TableCell>
 
-                                                <Dialog
-                                                    open={openDialogId === row.id}
-                                                    onOpenChange={(isOpen) => setOpenDialogId(isOpen ? row.id : null)}
-                                                >
+                                            <TableCell >
+                                                {row.phone || 'not phone'}
+                                            </TableCell>
 
-                                                    <DialogTrigger>
-                                                        <Button variant="ghost" size="icon"
-                                                                // onClick={() => onEdit(row)}
-                                                            >
-                                                              <span className="flex items-center">
-                                                                <Edit className="h-4 w-4" />
-                                                                <span className="sr-only">Изменить</span>
-                                                              </span>
-                                                        </Button>
-                                                    </DialogTrigger>
-
-                                                    <DialogContent className="bg-white text-black">
-
-                                                    <DialogHeader>
-                                                            <DialogTitle>Единицы измерения</DialogTitle>
-                                                            <DialogDescription>
-                                                                Обработчик для работы с единицами измерениями
-                                                            </DialogDescription>
-                                                        </DialogHeader>
-                                                        <div>
-                                                            <UnitForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} unit={row}/>
-                                                        </div>
-                                                    </DialogContent>
-                                                </Dialog>
+                                            <TableCell >
+                                                {row.createdAt.toString()}
+                                            </TableCell>
 
 
 
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end space-x-2">
 
+                                                    <Dialog
+                                                        open={openDialogId === row.id}
+                                                        onOpenChange={(isOpen) => setOpenDialogId(isOpen ? row.id : null)}
+                                                    >
 
-                                                <Dialog
-                                                    open={openDeleteDialogId === row.id}
-                                                    onOpenChange={(isOpen) => setOpenDeleteDialogId(isOpen ? row.id : null)}
-                                                >
+                                                        <DialogTrigger>
+                                                            <Button variant="ghost" size="icon"
+                                                                >
+                                                                  <span className="flex items-center">
+                                                                    <Edit className="h-4 w-4" />
+                                                                    <span className="sr-only">Изменить</span>
+                                                                  </span>
+                                                            </Button>
+                                                        </DialogTrigger>
 
-                                                    <DialogTrigger>
-                                                        <Button variant="ghost" size="icon"
-                                                            // onClick={() => onDelete(row)}
-                                                        >
-                                                      <span className="flex items-center">
-                                                        <Trash className="h-4 w-4" />
-                                                        <span className="sr-only">Удалить</span>
-                                                      </span>
-                                                        </Button>
-                                                    </DialogTrigger>
-
-                                                    <DialogContent className="bg-white text-black">
+                                                        <DialogContent className="bg-white text-black">
 
                                                         <DialogHeader>
-                                                            <DialogTitle>Единицы измерения</DialogTitle>
-                                                            <DialogDescription>
-                                                                {`Вы уверены, что хотите удалить Единицу измерения ${row.name}?`}
-                                                            </DialogDescription>
-                                                        </DialogHeader>
+                                                                <DialogTitle>Заявители</DialogTitle>
+                                                                <DialogDescription>
+                                                                    Обработчик для работы с Заявителями
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+                                                            <div>
+                                                                <ApplicantForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} data={row}/>
+                                                            </div>
+                                                        </DialogContent>
+                                                    </Dialog>
 
-                                                        <div className={'justify-end flex gap-5 mt-3'}>
-                                                            <Button  type="button" variant="secondary" onClick={()=>setOpenDeleteDialogId(null)}>
-                                                                Отмена
+
+
+
+
+                                                    <Dialog
+                                                        open={openDeleteDialogId === row.id}
+                                                        onOpenChange={(isOpen) => setOpenDeleteDialogId(isOpen ? row.id : null)}
+                                                    >
+
+                                                        <DialogTrigger>
+                                                            <Button variant="ghost" size="icon"
+                                                            >
+                                                          <span className="flex items-center">
+                                                            <Trash className="h-4 w-4" />
+                                                            <span className="sr-only">Удалить</span>
+                                                          </span>
                                                             </Button>
+                                                        </DialogTrigger>
 
-                                                            <Button
-                                                            onClick={()=>deleteObj(row.id)}>
-                                                                Удалить
-                                                            </Button>
-                                                        </div>
+                                                        <DialogContent className="bg-white text-black">
 
-                                                    </DialogContent>
-                                                </Dialog>
+                                                            <DialogHeader>
+                                                                <DialogTitle>Единицы измерения</DialogTitle>
+                                                                <DialogDescription>
+                                                                    {`Вы уверены, что хотите удалить Заявителя ${row.name}?`}
+                                                                </DialogDescription>
+                                                            </DialogHeader>
 
-                                            </div>
-                                        </TableCell>
+                                                            <div className={'justify-end flex gap-5 mt-3'}>
+                                                                <Button  type="button" variant="secondary" onClick={()=>setOpenDeleteDialogId(null)}>
+                                                                    Отмена
+                                                                </Button>
 
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
+                                                                <Button
+                                                                onClick={()=>deleteObj(row.id)}>
+                                                                    Удалить
+                                                                </Button>
+                                                            </div>
 
-                    </Table>
-                </div>
+                                                        </DialogContent>
+                                                    </Dialog>
+
+                                                </div>
+                                            </TableCell>
+
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+
+                        </Table>
+                    </div>
+                    :<div>Unable to load data</div>}
+
+                {totalPages > 1 && (
+                    <div className="py-4 border-t">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    {searchParams.page === 1 ? (
+                                        <PaginationPrevious
+                                            aria-disabled="true"
+                                            className="pointer-events-none opacity-50"
+                                            tabIndex={-1}
+                                        />
+                                    ) : (
+                                        <PaginationPrevious
+                                            onClick={() =>  setSearchParams({...searchParams, page:Math.max(1, searchParams.page - 1)})}
+                                        />
+                                    )}
+                                </PaginationItem>
+
+                                {getPageLinks()}
+
+                                <PaginationItem>
+                                    {searchParams.page === totalPages ? (
+                                        <PaginationNext
+                                            aria-disabled="true"
+                                            className="pointer-events-none opacity-50"
+                                            tabIndex={-1}
+                                        />
+                                    ) : (
+                                        <PaginationNext
+                                            onClick={() =>setSearchParams({...searchParams, page:Math.max(1, searchParams.page + 1)})}
+                                        />
+                                    )}
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
+                <ScrollBar orientation="horizontal" />
             </ScrollArea>
-                :<div>Unable to load data</div>}
-
-
-
-            {totalPages > 1 && (
-                <div className="py-4 border-t">
-                    <Pagination>
-                        <PaginationContent>
-                            <PaginationItem>
-                                {searchParams.page === 1 ? (
-                                    <PaginationPrevious
-                                        aria-disabled="true"
-                                        className="pointer-events-none opacity-50"
-                                        tabIndex={-1}
-                                    />
-                                ) : (
-                                    <PaginationPrevious
-                                        onClick={() =>  setSearchParams({...searchParams, page:Math.max(1, searchParams.page - 1)})}
-                                    />
-                                )}
-                            </PaginationItem>
-
-                            {getPageLinks()}
-
-                            <PaginationItem>
-                                {searchParams.page === totalPages ? (
-                                    <PaginationNext
-                                        aria-disabled="true"
-                                        className="pointer-events-none opacity-50"
-                                        tabIndex={-1}
-                                    />
-                                ) : (
-                                    <PaginationNext
-                                        onClick={() =>setSearchParams({...searchParams, page:Math.max(1, searchParams.page + 1)})}
-                                    />
-                                )}
-                            </PaginationItem>
-                        </PaginationContent>
-                    </Pagination>
-                </div>
-            )}
         </div>
     );
 }

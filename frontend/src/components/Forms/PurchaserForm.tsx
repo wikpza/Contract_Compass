@@ -12,6 +12,7 @@ import {FormErrors, isFormErrors} from "@/lib/errors";
 import {toast} from "sonner";
 import {CreateApplicantType, GetApplicantType, UpdateApplicantType} from "@/types/Applicant.ts";
 import {Textarea} from "@/components/ui/textarea.tsx";
+import {CreatePurchaserType, GetPurchaserType, UpdatePurchaserType} from "@/types/Purchaser.ts";
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -31,15 +32,15 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface FormProps {
-  data?: GetApplicantType;
-  onCreate?: (input: CreateApplicantType) => void;
-  onUpdate?: (input :UpdateApplicantType) => void;
+  data?: GetPurchaserType;
+  onCreate?: (input: CreatePurchaserType) => void;
+  onUpdate?: (input :UpdatePurchaserType) => void;
   response: FormErrors | {message:string} | undefined,
     onCancel:()=>void,
     status?:number
 }
 
-const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }: FormProps) => {
+const PurchaserForm = ({ data, onCreate, onUpdate, response, onCancel, status }: FormProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -173,4 +174,4 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
   );
 };
 
-export default ApplicantForm;
+export default PurchaserForm;

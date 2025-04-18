@@ -1,25 +1,22 @@
 import {DeleteUnitType} from "@/types/Unit.ts";
 
-export type GetApplicantType = {
+export type GetProductType = {
     id:number,
     name:string,
-    email?:string,
-    phone?:string,
-    address?:string,
+    unitId:number,
     note?:string,
     createdAt:Date,
-    updatedAt:Date
+    updatedAt:Date,
+    unit:{id:number, name:string, symbol:string}
 }
 
 
-export type CreateApplicantType = {
+export type CreateProductType = {
     name:string,
-    email?:string,
-    phone?:string,
-    address?:string,
+    unitId:number,
     note?:string,
 }
 
-export type DeleteApplicantType = DeleteUnitType
-export type UpdateApplicantType = CreateApplicantType & DeleteApplicantType
+export type DeleteProductType = DeleteUnitType
+export type UpdateProductType = CreateProductType & DeleteProductType
 

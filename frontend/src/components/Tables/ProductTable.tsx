@@ -35,27 +35,28 @@ import {GetApplicantType} from "@/types/Applicant.ts";
 import SearchPanel from "@/components/SearchPanel.tsx";
 import {useDeleteApplicant, useUpdateApplicant} from "@/api/Applicant.api.ts";
 import ApplicantForm from "@/components/Forms/ApplicantForm.tsx";
+import {GetProductType} from "@/types/Product.ts";
+import {useDeleteProduct, useUpdateProduct} from "@/api/Product.api.ts";
+import ProductForm from "@/components/Forms/ProductForm.tsx";
 
 type Props = {
     searchParams:SearchParams,
     setSearchParams: (input:SearchParams)=>void
-    data:{count:number, rows:GetApplicantType[]} | undefined,
+    data:{count:number, rows:GetProductType[]} | undefined,
     refetch: ()=>void,
 }
 
-export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Props) {
+export function ProductTable({data, refetch, searchParams, setSearchParams}:Props) {
 
     const totalPages = Math.ceil(data?.count / searchParams.limit);
     const columns = [
         {value:"name", name:"Название"},
-        {value:"email", name:"Почта"},
-        {value:"address", name:"Адрес"},
+        // {value:"unitId", name:"Единица измерения"},
         {value:"note", name:"Заметка"},
-        {value:"phone", name:"Телефон"},
         {value:"createdAt", name:"Дата создания"}
     ]
-    const {update, isSuccess:isUpdateSuccess, response:updateResponse} = useUpdateApplicant()
-    const {deleteObj, data:deleteResponse, isSuccess:isDeleteSuccess} = useDeleteApplicant()
+    const {update, isSuccess:isUpdateSuccess, response:updateResponse} = useUpdateProduct()
+    const {deleteObj, data:deleteResponse, isSuccess:isDeleteSuccess} = useDeleteProduct()
 
     const [openDialogId, setOpenDialogId] = useState<number | null>(null);
     const [openDeleteDialogId, setOpenDeleteDialogId] = useState<number | null>(null);
@@ -151,33 +152,109 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
 
                                     <TableHead>ID</TableHead>
 
-                                    {columns.map(column=>(
-                                        <TableHead
-                                            className={searchParams.sortBy === column.value ? 'cursor-pointer' : ''}
-                                            onClick={()=>{
-                                                if(searchParams.sortBy === column.value) setSearchParams( {...searchParams, sortType: (searchParams.sortType === 'ASC')?'DESC':'ASC'})
-                                                else setSearchParams({...searchParams, sortBy:column.value})
-                                            }}
-                                        >
+                                    <TableHead
+                                        className={searchParams.sortBy === 'name' ? 'cursor-pointer' : ''}
+                                        onClick={()=>{
+                                            if(searchParams.sortBy === 'name') setSearchParams( {...searchParams, sortType: (searchParams.sortType === 'ASC')?'DESC':'ASC'})
+                                            else setSearchParams({...searchParams, sortBy:'name'})
+                                        }}
+                                    >
 
-                                            <div className="flex items-center gap-1">
-                                                {column.name}
-                                                {searchParams.sortBy === column.value && (
+                                        <div className="flex items-center gap-1">
+                                            {"Название"}
+                                            {searchParams.sortBy === 'name' && (
                                                 searchParams.sortType === 'ASC'
                                                     ? <ArrowUp className="h-3 w-3"/>
                                                     : <ArrowDown className="h-3 w-3"/>
                                             )}
-                                            </div>
+                                        </div>
 
-                                        </TableHead>
-                                    ))}
+                                    </TableHead>
+
+                                    <TableHead
+                                        className={searchParams.sortBy === 'unitId' ? 'cursor-pointer' : ''}
+                                        onClick={()=>{
+                                            if(searchParams.sortBy === 'unitId') setSearchParams( {...searchParams, sortType: (searchParams.sortType === 'ASC')?'DESC':'ASC'})
+                                            else setSearchParams({...searchParams, sortBy:'unitId'})
+                                        }}
+                                    >
+
+                                        <div className="flex items-center gap-1">
+                                            {"Единица измерения"}
+                                            {searchParams.sortBy === 'unitId' && (
+                                                searchParams.sortType === 'ASC'
+                                                    ? <ArrowUp className="h-3 w-3"/>
+                                                    : <ArrowDown className="h-3 w-3"/>
+                                            )}
+                                        </div>
+
+                                    </TableHead>
+
+                                    <TableHead
+                                        className={searchParams.sortBy === 'note' ? 'cursor-pointer' : ''}
+                                        onClick={()=>{
+                                            if(searchParams.sortBy === 'note') setSearchParams( {...searchParams, sortType: (searchParams.sortType === 'ASC')?'DESC':'ASC'})
+                                            else setSearchParams({...searchParams, sortBy:'note'})
+                                        }}
+                                    >
+
+                                        <div className="flex items-center gap-1">
+                                            {"Заметка"}
+                                            {searchParams.sortBy === 'note' && (
+                                                searchParams.sortType === 'ASC'
+                                                    ? <ArrowUp className="h-3 w-3"/>
+                                                    : <ArrowDown className="h-3 w-3"/>
+                                            )}
+                                        </div>
+
+                                    </TableHead>
+
+                                    <TableHead
+                                        className={searchParams.sortBy === 'createdAt' ? 'cursor-pointer' : ''}
+                                        onClick={()=>{
+                                            if(searchParams.sortBy === 'createdAt') setSearchParams( {...searchParams, sortType: (searchParams.sortType === 'ASC')?'DESC':'ASC'})
+                                            else setSearchParams({...searchParams, sortBy:'createdAt'})
+                                        }}
+                                    >
+
+                                        <div className="flex items-center gap-1">
+                                            {"Дата создания"}
+                                            {searchParams.sortBy === 'createdAt' && (
+                                                searchParams.sortType === 'ASC'
+                                                    ? <ArrowUp className="h-3 w-3"/>
+                                                    : <ArrowDown className="h-3 w-3"/>
+                                            )}
+                                        </div>
+
+                                    </TableHead>
+
+                                    {/*{columns.map(column=>(*/}
+                                    {/*    <TableHead*/}
+                                    {/*        className={searchParams.sortBy === column.value ? 'cursor-pointer' : ''}*/}
+                                    {/*        onClick={()=>{*/}
+                                    {/*            if(searchParams.sortBy === column.value) setSearchParams( {...searchParams, sortType: (searchParams.sortType === 'ASC')?'DESC':'ASC'})*/}
+                                    {/*            else setSearchParams({...searchParams, sortBy:column.value})*/}
+                                    {/*        }}*/}
+                                    {/*    >*/}
+
+                                    {/*        <div className="flex items-center gap-1">*/}
+                                    {/*            {column.name}*/}
+                                    {/*            {searchParams.sortBy === column.value && (*/}
+                                    {/*            searchParams.sortType === 'ASC'*/}
+                                    {/*                ? <ArrowUp className="h-3 w-3"/>*/}
+                                    {/*                : <ArrowDown className="h-3 w-3"/>*/}
+                                    {/*        )}*/}
+                                    {/*        </div>*/}
+
+                                    {/*    </TableHead>*/}
+                                    {/*))}*/}
 
                                     <TableHead className="text-right">Действие</TableHead>
 
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {data.rows.length === 0 ? (
+                                {data?.rows.length === 0 ? (
                                     <TableRow>
                                         <TableCell
                                             className="h-24 text-center"
@@ -200,20 +277,13 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                             </TableCell>
 
                                             <TableCell >
-                                                {row.email || 'not email'}
-                                            </TableCell>
-
-                                            <TableCell >
-                                                {row.address || "not address"}
+                                                {row.unit.name || 'not unit'}
                                             </TableCell>
 
                                             <TableCell >
                                                 {row.note || 'not note'}
                                             </TableCell>
 
-                                            <TableCell >
-                                                {row.phone || 'not phone'}
-                                            </TableCell>
 
                                             <TableCell >
                                                 {row.createdAt.toString()}
@@ -242,13 +312,13 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                         <DialogContent className="bg-white text-black">
 
                                                         <DialogHeader>
-                                                                <DialogTitle>Заявители</DialogTitle>
+                                                                <DialogTitle>Продукты</DialogTitle>
                                                                 <DialogDescription>
-                                                                    Обработчик для работы с Заявителями
+                                                                    Обработчик для работы с Продуктами
                                                                 </DialogDescription>
                                                             </DialogHeader>
                                                             <div>
-                                                                <ApplicantForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} data={row}/>
+                                                                <ProductForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} data={row}/>
                                                             </div>
                                                         </DialogContent>
                                                     </Dialog>
@@ -275,9 +345,9 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                         <DialogContent className="bg-white text-black">
 
                                                             <DialogHeader>
-                                                                <DialogTitle>Единицы измерения</DialogTitle>
+                                                                <DialogTitle>Продукты</DialogTitle>
                                                                 <DialogDescription>
-                                                                    {`Вы уверены, что хотите удалить Заявителя ${row.name}?`}
+                                                                    {`Вы уверены, что хотите удалить Продукт ${row.name}?`}
                                                                 </DialogDescription>
                                                             </DialogHeader>
 

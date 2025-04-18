@@ -10,44 +10,54 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import {CreateUnitType, GetUnitType, UpdateUnitType} from "@/types/Unit.ts";
 import {FormErrors, isFormErrors} from "@/lib/errors";
 import {toast} from "sonner";
+import {CreateApplicantType, GetApplicantType, UpdateApplicantType} from "@/types/Applicant.ts";
+import {Textarea} from "@/components/ui/textarea.tsx";
 
 const formSchema = z.object({
-  name: z.string().min(2, {
-    message: 'Name must be at least 2 characters'
-  }),
-  symbol: z.string().min(1, {
-    message: 'Abbreviation is required'
-  }).max(10, {
-    message: 'Abbreviation must be at most 10 characters'
-  }),
+    name: z.string().min(2, {
+        message: 'Name must be at least 2 characters'
+    }),
+    email: z.string().email({
+        message: 'Please enter a valid email address'
+    }).optional().or(z.literal('')),
+    phone: z.string().min(5, {
+        message: 'Phone number must be at least 5 characters'
+    }).optional().or(z.literal('')),
+    address: z.string().min(5, {
+        message: 'Address must be at least 5 characters'
+    }).optional().or(z.literal('')),
+    note: z.string().optional().or(z.literal(''))
 });
-
 type FormValues = z.infer<typeof formSchema>;
 
-interface UnitFormProps {
-  unit?: GetUnitType;
-  onCreate?: (unit: CreateUnitType) => void;
-  onUpdate?: (unit:UpdateUnitType) => void;
+interface FormProps {
+  data?: GetApplicantType;
+  onCreate?: (input: CreateApplicantType) => void;
+  onUpdate?: (input :UpdateApplicantType) => void;
   response: FormErrors | {message:string} | undefined,
     onCancel:()=>void,
     status?:number
 }
 
-const UnitForm = ({ unit, onCreate, onUpdate, response, onCancel, status }: UnitFormProps) => {
+const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }: FormProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: unit?.name || '',
-        symbol: unit?.symbol || '',
+      name: data?.name || '',
+        email:data?.email || "",
+        phone:data?.phone || "",
+        address:data?.address || "",
+        note:data?.note || "",
+
     }
   });
 
-  const handleSubmit = (data: CreateUnitType) => {
+  const handleSubmit = (input: CreateApplicantType) => {
 
     if(onCreate){
-        onCreate(data)
-    }else if(onUpdate && unit && unit?.id){
-        onUpdate({...data, id:unit?.id})
+        onCreate(input)
+    }else if(onUpdate && data && data?.id){
+        onUpdate({...input, id:data?.id})
     }else{
        toast.error("Error server, try later")
     }
@@ -55,55 +65,99 @@ const UnitForm = ({ unit, onCreate, onUpdate, response, onCancel, status }: Unit
   };
 
     useEffect(() => {
-        console.log(response, status)
-        if (response  && isFormErrors(response) && status && status >= 400 && status < 500) {
-            console.log(1)
-            if ("name" in response.details) {
-                console.log(2)
-                form.setError("name", {
-                    type: "manual",
-                    message: response.details.name.join(","),
-                });
-            } else if ("symbol" in response.details) {
-                form.setError("symbol", {
-                    type: "manual",
-                    message:response.details.symbol.join(","),
-                });
-            }else {
+        if (response && isFormErrors(response) && status && status >= 400 && status < 500) {
+            const errorFields = Object.keys(response.details) as Array<keyof FormValues>;
+
+            errorFields.forEach(field => {
+                if (field in form.getValues()) {
+                    form.setError(field, {
+                        type: "manual",
+                        message: response.details[field].join(", "),
+                    });
+                }
+            });
+
+            if (errorFields.length === 0) {
                 toast.error(response.message);
             }
         }
-    }, [response, form]);
+    }, [response, form, status]);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Название</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Unit name" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="symbol"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Символ</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="e.g. kg, pcs, m" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
+
+          <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Имя</FormLabel>
+                      <FormControl>
+                          <Input {...field} placeholder="Full name" />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+              )}
+          />
+
+          <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Почта</FormLabel>
+                      <FormControl>
+                          <Input {...field} type="email" placeholder="Email address" />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+              )}
+          />
+
+          <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Телефон</FormLabel>
+                      <FormControl>
+                          <Input {...field} placeholder="Phone number" />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+              )}
+          />
+
+          <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Адресс</FormLabel>
+                      <FormControl>
+                          <Input {...field} placeholder="Address" />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+              )}
+          />
+
+          <FormField
+              control={form.control}
+              name="note"
+              render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Заметка</FormLabel>
+                      <FormControl>
+                          <Textarea {...field} placeholder="Additional notes" />
+                      </FormControl>
+                      <FormMessage />
+                  </FormItem>
+              )}
+          />
+
         <div className="flex justify-end space-x-2">
 
           <Button type="button" variant="outline" onClick={onCancel}>
@@ -111,7 +165,7 @@ const UnitForm = ({ unit, onCreate, onUpdate, response, onCancel, status }: Unit
           </Button>
 
           <Button type="submit">
-            {onCreate ? 'Создать' : 'Обновить'} Unit
+            {onCreate ? 'Создать' : 'Обновить'} Заявителя
           </Button>
         </div>
       </form>
@@ -119,4 +173,4 @@ const UnitForm = ({ unit, onCreate, onUpdate, response, onCancel, status }: Unit
   );
 };
 
-export default UnitForm;
+export default ApplicantForm;

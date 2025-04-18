@@ -1,68 +1,99 @@
-
-import React, {useEffect} from 'react';
-import { useForm } from 'react-hook-form';
+import React, {useEffect, useState} from 'react';
+import {Controller, useForm} from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
-
-import {CreateUnitType, GetUnitType, UpdateUnitType} from "@/types/Unit.ts";
 import {FormErrors, isFormErrors} from "@/lib/errors";
 import {toast} from "sonner";
-import {CreateApplicantType, GetApplicantType, UpdateApplicantType} from "@/types/Applicant.ts";
 import {Textarea} from "@/components/ui/textarea.tsx";
+import {CreateProductType, GetProductType, UpdateProductType} from "@/types/Product.ts";
+import {useGetUnits} from "@/api/Unit.api.ts";
+import {SearchParams} from "@/types";
 
 const formSchema = z.object({
     name: z.string().min(2, {
         message: 'Name must be at least 2 characters'
     }),
-    email: z.string().email({
-        message: 'Please enter a valid email address'
-    }).optional().or(z.literal('')),
-    phone: z.string().min(5, {
-        message: 'Phone number must be at least 5 characters'
-    }).optional().or(z.literal('')),
-    address: z.string().min(5, {
-        message: 'Address must be at least 5 characters'
-    }).optional().or(z.literal('')),
+    unitId: z.number().min(1, "Please select a unit"),
     note: z.string().optional().or(z.literal(''))
 });
 type FormValues = z.infer<typeof formSchema>;
 
 interface FormProps {
-  data?: GetApplicantType;
-  onCreate?: (input: CreateApplicantType) => void;
-  onUpdate?: (input :UpdateApplicantType) => void;
-  response: FormErrors | {message:string} | undefined,
+    data?: GetProductType;
+    onCreate?: (input: CreateProductType) => void;
+    onUpdate?: (input :UpdateProductType) => void;
+    response: FormErrors | {message:string} | undefined,
     onCancel:()=>void,
     status?:number
 }
 
-const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }: FormProps) => {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: data?.name || '',
-        email:data?.email || "",
-        phone:data?.phone || "",
-        address:data?.address || "",
-        note:data?.note || "",
+const ProductForm = ({ data:productData, onCreate, onUpdate, response, onCancel, status }: FormProps) => {
+    const form = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            name: productData?.name || '',
+            note: productData?.note || "",
+            unitId: productData?.unitId || undefined
+        }
+    });
 
-    }
-  });
+    const [searchParams, setSearchParams] = useState<SearchParams>({
+        searchBy: "name",
+        searchValue: "",
+        page: 1,
+        sortBy: "name",
+        sortType: "ASC",
+        limit: 10
+    });
 
-  const handleSubmit = (input: CreateApplicantType) => {
+    const [inputValue, setInputValue] = useState("");
+    const [showOptions, setShowOptions] = useState(false);
+    const {data, refetch} = useGetUnits(searchParams);
 
-    if(onCreate){
-        onCreate(input)
-    }else if(onUpdate && data && data?.id){
-        onUpdate({...input, id:data?.id})
-    }else{
-       toast.error("Error server, try later")
-    }
+    // Загрузка вариантов при изменении inputValue
+    useEffect(() => {
+            if (inputValue.length > 1) {
+                setSearchParams(prev => ({...prev, searchValue: inputValue}));
+                refetch();
+            }
+    }, [inputValue]);
 
-  };
+    // Установка начального значения для input
+    useEffect(() => {
+        if (productData?.unitId && data?.data?.rows) {
+            const unit = data.data.rows.find(u => u.id === productData.unitId);
+            if (unit) {
+                setInputValue(unit.name);
+            }
+        }
+    }, [productData, data]);
+
+    const handleUnitSelect = (unitId: number, unitName: string) => {
+        form.setValue('unitId', unitId);
+        setInputValue(unitName);
+        setShowOptions(false);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+        if (e.target.value === "") {
+            form.setValue('unitId', 0);
+        }
+        setShowOptions(true);
+    };
+
+    const handleSubmit = (input: CreateProductType) => {
+        if (onCreate) {
+            onCreate(input);
+        } else if (onUpdate && productData?.id) {
+            onUpdate({...input, id: productData.id});
+        } else {
+            toast.error("Error server, try later");
+        }
+    };
 
     useEffect(() => {
         if (response && isFormErrors(response) && status && status >= 400 && status < 500) {
@@ -83,94 +114,80 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
         }
     }, [response, form, status]);
 
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Имя</FormLabel>
+                            <FormControl>
+                                <Input {...field} placeholder="Full name" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
+                <FormItem>
+                    <FormLabel>Единица измерения</FormLabel>
+                    <FormControl>
+                        <div className="relative">
+                            <Input
+                                value={inputValue}
+                                onChange={handleInputChange}
+                                placeholder="Выберите единицу..."
+                                onFocus={() => setShowOptions(true)}
+                                list="unit-options"
+                            />
+                            {showOptions && data?.data?.rows && data.data.rows.length > 0 && (
+                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+                                    {data.data.rows.map(unit => (
+                                        <div
+                                            key={unit.id}
+                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => handleUnitSelect(unit.id, unit.name)}
+                                        >
+                                            {unit.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
-          <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Имя</FormLabel>
-                      <FormControl>
-                          <Input {...field} placeholder="Full name" />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-              )}
-          />
+                        </div>
+                    </FormControl>
+                    {form.formState.errors.unitId && (
+                        <FormMessage>{form.formState.errors.unitId.message}</FormMessage>
+                    )}
+                </FormItem>
 
-          <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Почта</FormLabel>
-                      <FormControl>
-                          <Input {...field} type="email" placeholder="Email address" />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-              )}
-          />
+                <FormField
+                    control={form.control}
+                    name="note"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Заметка</FormLabel>
+                            <FormControl>
+                                <Textarea {...field} placeholder="Additional notes" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-          <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Телефон</FormLabel>
-                      <FormControl>
-                          <Input {...field} placeholder="Phone number" />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-              )}
-          />
-
-          <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Адресс</FormLabel>
-                      <FormControl>
-                          <Input {...field} placeholder="Address" />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-              )}
-          />
-
-          <FormField
-              control={form.control}
-              name="note"
-              render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>Заметка</FormLabel>
-                      <FormControl>
-                          <Textarea {...field} placeholder="Additional notes" />
-                      </FormControl>
-                      <FormMessage />
-                  </FormItem>
-              )}
-          />
-
-        <div className="flex justify-end space-x-2">
-
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Закрыть
-          </Button>
-
-          <Button type="submit">
-            {onCreate ? 'Создать' : 'Обновить'} Заявителя
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
+                <div className="flex justify-end space-x-2">
+                    <Button type="button" variant="outline" onClick={onCancel}>
+                        Закрыть
+                    </Button>
+                    <Button type="submit">
+                        {onCreate ? 'Создать' : 'Обновить'} Продукт
+                    </Button>
+                </div>
+            </form>
+        </Form>
+    );
 };
 
-export default ApplicantForm;
+export default ProductForm;

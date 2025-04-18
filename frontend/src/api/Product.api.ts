@@ -3,14 +3,15 @@ import {toast} from "sonner";
 import {FormErrors, handleServerError, isFormErrors, isValidJSON} from "@/lib/errors";
 import {SearchParams} from "@/types";
 import {CreateApplicantType, GetApplicantType, UpdateApplicantType} from "@/types/Applicant.ts";
+import {CreateProductType, GetProductType, UpdateProductType} from "@/types/Product.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-export const useGetApplicants = (
+export const useGetProducts = (
     input: SearchParams
 ) => {
     const accessToken = localStorage.getItem('token');
 
-    const getRequest = async (): Promise<{data?: {count: number, rows: GetApplicantType[]}, status: number}> => {
+    const getRequest = async (): Promise<{data?: {count: number, rows: GetProductType[]}, status: number}> => {
         // Создаем объект URLSearchParams и добавляем параметры
         const params = new URLSearchParams();
 
@@ -38,7 +39,7 @@ export const useGetApplicants = (
             params.append('sortBy', input.sortBy);
         }
 
-        const url = `${API_BASE_URL}/applicant?${params.toString()}`;
+        const url = `${API_BASE_URL}/product?${params.toString()}`;
 
         const response = await fetch(url, {
             method: "GET",
@@ -60,7 +61,7 @@ export const useGetApplicants = (
     }
 
     const {data, isLoading, error, refetch} = useQuery(
-        ['fetchApplicant', input], // Ключ запроса теперь включает параметры
+        ['fetchProduct', input], // Ключ запроса теперь включает параметры
         getRequest,
         {retry: 1}
     );
@@ -68,26 +69,22 @@ export const useGetApplicants = (
     return {data, isLoading, error, refetch};
 }
 
-export const useCreateApplicant = ()=>{
+export const useCreateProduct = ()=>{
     const accessToken = localStorage.getItem('token');
 
-    const createRequest = async(input:CreateApplicantType):Promise<
+    const createRequest = async(input:CreateProductType):Promise<
         {
-            unit?:GetApplicantType,
+            unit?:GetProductType,
             response?: FormErrors | { message: string};
             status:number
         }>=>{
 
-        const inputData:CreateApplicantType = {name:""}
+        const inputData:CreateProductType = {name:input.name, unitId:input.unitId}
 
-        if(input.name && input.name !== "") inputData.name = input.name
-        if(input.address && input.address !== "") inputData.address = input.address
-        if(input.phone && input.phone !== "") inputData.phone = input.phone
-        if(input.email && input.email !== "") inputData.email = input.email
         if(input.note && input.note !== "") inputData.note = input.note
 
 
-        const response = await fetch(`${API_BASE_URL}/applicant`,
+        const response = await fetch(`${API_BASE_URL}/product`,
             {
                 method:"POST",
                 headers:{
@@ -123,7 +120,7 @@ export const useCreateApplicant = ()=>{
         retry:0,
         onSuccess: (data) => {
             if(data?.status === 201)
-                toast.success("Заявитель успешно добавлен");
+                toast.success("Продукт успешно добавлен");
         },
 
     })
@@ -131,16 +128,16 @@ export const useCreateApplicant = ()=>{
     return {create, isLoading, error, isSuccess, response:data}
 }
 
-export const useUpdateApplicant = ()=>{
+export const useUpdateProduct = ()=>{
     const accessToken = localStorage.getItem('token');
-    const updateUnitRequest = async(input:UpdateApplicantType):Promise<
+    const updateUnitRequest = async(input:UpdateProductType):Promise<
         {
-            unit?:GetApplicantType,
+            unit?:GetProductType,
             response?: FormErrors | { message: string};
             status:number
         }>=>{
 
-        const response = await fetch(`${API_BASE_URL}/applicant/${input.id}`,
+        const response = await fetch(`${API_BASE_URL}/product/${input.id}`,
             {
                 method:"PATCH",
                 headers:{
@@ -176,26 +173,26 @@ export const useUpdateApplicant = ()=>{
         retry:0,
         onSuccess: (data) => {
             if(data?.status >= 200 && data?.status < 300)
-                toast.success("Заявитель успешно обновлен");
+                toast.success("Продукт успешно обновлен");
         },
     })
 
     return {update, isLoading, error, isSuccess, response:data}
 }
 
-export const useDeleteApplicant = ()=> {
+export const useDeleteProduct = ()=> {
     const accessToken = localStorage.getItem('token');
 
     const deleteRequest = async (id: number): Promise<
         {
-            unit?:GetApplicantType,
+            unit?:GetProductType,
             response?: FormErrors | { message: string};
             status:number
         }
     >=>{
 
 
-        const response = await fetch(`${API_BASE_URL}/applicant/${id}`,{
+        const response = await fetch(`${API_BASE_URL}/product/${id}`,{
             method:"DELETE",
             headers:{
                 'Content-Type': "application/json",
@@ -231,10 +228,10 @@ export const useDeleteApplicant = ()=> {
         error,
         isSuccess,
         data
-    } = useMutation("DeleteApplicant", deleteRequest, {
+    } = useMutation("DeleteProduct", deleteRequest, {
         retry:0,
         onSuccess: (data) => {
-            if(data && data.status && data?.status >= 200 && data?.status < 300) toast.success('Заявитель успешно удален');
+            if(data && data.status && data?.status >= 200 && data?.status < 300) toast.success('Продукт успешно удален');
             if(data && data.status && data?.status === 409) toast.error(data.response.message);
         },
 

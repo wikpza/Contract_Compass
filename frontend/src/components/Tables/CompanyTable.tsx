@@ -40,15 +40,18 @@ import {GetApplicantType} from "@/types/Applicant.ts";
 import SearchPanel from "@/components/SearchPanel.tsx";
 import {useDeleteApplicant, useUpdateApplicant} from "@/api/Applicant.api.ts";
 import ApplicantForm from "@/components/Forms/ApplicantForm.tsx";
+import {GetCompanyType} from "@/types/Company.ts";
+import {useDeleteCompany, useUpdateCompany} from "@/api/Company.api.ts";
+import CompanyForm from "@/components/Forms/CompanyForm.tsx";
 
 type Props = {
     searchParams:SearchParams,
     setSearchParams: (input:SearchParams)=>void
-    data:{count:number, rows:GetApplicantType[]} | undefined,
+    data:{count:number, rows:GetCompanyType[]} | undefined,
     refetch: ()=>void,
 }
 
-export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Props) {
+export function CompanyTable({data, refetch, searchParams, setSearchParams}:Props) {
 
     const totalPages = Math.ceil(data?.count / searchParams.limit);
     const columns = [
@@ -59,8 +62,8 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
         {value:"phone", name:"Телефон"},
         {value:"createdAt", name:"Дата создания"}
     ]
-    const {update, isSuccess:isUpdateSuccess, response:updateResponse} = useUpdateApplicant()
-    const {deleteObj, data:deleteResponse, isSuccess:isDeleteSuccess} = useDeleteApplicant()
+    const {update, isSuccess:isUpdateSuccess, response:updateResponse} = useUpdateCompany()
+    const {deleteObj, data:deleteResponse, isSuccess:isDeleteSuccess} = useDeleteCompany()
 
     const [openDialogId, setOpenDialogId] = useState<number | null>(null);
     const [openDeleteDialogId, setOpenDeleteDialogId] = useState<number | null>(null);
@@ -248,11 +251,11 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                     <DialogHeader>
                                                             <DialogTitle>Единицы измерения</DialogTitle>
                                                             <DialogDescription>
-                                                                Обработчик для работы с единицами измерениями
+                                                                Обработчик для работы с Компаниями
                                                             </DialogDescription>
                                                         </DialogHeader>
                                                         <div>
-                                                            <ApplicantForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} data={row}/>
+                                                            <CompanyForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} data={row}/>
                                                         </div>
                                                     </DialogContent>
                                                 </Dialog>
@@ -279,9 +282,9 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                     <DialogContent className="bg-white text-black">
 
                                                         <DialogHeader>
-                                                            <DialogTitle>Единицы измерения</DialogTitle>
+                                                            <DialogTitle>Компания</DialogTitle>
                                                             <DialogDescription>
-                                                                {`Вы уверены, что хотите удалить Заявителя ${row.name}?`}
+                                                                {`Вы уверены, что хотите удалить Компанию ${row.name}?`}
                                                             </DialogDescription>
                                                         </DialogHeader>
 

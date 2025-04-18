@@ -1,6 +1,6 @@
 import {DeleteUnitType} from "@/types/Unit.ts";
 
-export type GetApplicantType = {
+export type GetCompanyType = {
     id:number,
     name:string,
     email?:string,
@@ -12,7 +12,7 @@ export type GetApplicantType = {
 }
 
 
-export type CreateApplicantType = {
+export type CreateCompanyType = {
     name:string,
     email?:string,
     phone?:string,
@@ -20,6 +20,6 @@ export type CreateApplicantType = {
     note?:string,
 }
 
-export type DeleteApplicantType = DeleteUnitType
-export type UpdateApplicantType = CreateApplicantType & DeleteApplicantType
+export type DeleteCompanyType = DeleteUnitType
+export type UpdateCompanyType = CreateCompanyType & DeleteCompanyType
 
