@@ -64,7 +64,7 @@ const Products = () => {
               <Button asChild>
                 <div>
                   <PlusCircle className="h-4 w-4 mr-1"/>
-                  {"Добавить Компанию"}
+                  {"Добавить Продукт"}
                 </div>
               </Button>
             </DialogTrigger>

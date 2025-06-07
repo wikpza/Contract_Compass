@@ -76,7 +76,7 @@ export const useCreateApplicant = ()=>{
             unit?:GetApplicantType,
             response?: FormErrors | { message: string};
             status:number
-        }>=>{
+        }> =>{
 
         const inputData:CreateApplicantType = {name:""}
 
@@ -85,6 +85,7 @@ export const useCreateApplicant = ()=>{
         if(input.phone && input.phone !== "") inputData.phone = input.phone
         if(input.email && input.email !== "") inputData.email = input.email
         if(input.note && input.note !== "") inputData.note = input.note
+
 
 
         const response = await fetch(`${API_BASE_URL}/applicant`,
@@ -138,8 +139,15 @@ export const useUpdateApplicant = ()=>{
             unit?:GetApplicantType,
             response?: FormErrors | { message: string};
             status:number
-        }>=>{
+        }> =>{
 
+        const inputData:CreateApplicantType = {name:""}
+
+        if(input.name && input.name !== "") inputData.name = input.name
+        if(input.address && input.address !== "") inputData.address = input.address
+        if(input.phone && input.phone !== "") inputData.phone = input.phone
+        if(input.email && input.email !== "") inputData.email = input.email
+        if(input.note && input.note !== "") inputData.note = input.note
         const response = await fetch(`${API_BASE_URL}/applicant/${input.id}`,
             {
                 method:"PATCH",
@@ -147,7 +155,7 @@ export const useUpdateApplicant = ()=>{
                     "Content-Type": "application/json",
                     Authorization:`Bearer ${accessToken}`,
                 },
-                body:JSON.stringify(input)
+                body:JSON.stringify(inputData)
             })
 
 
@@ -192,7 +200,7 @@ export const useDeleteApplicant = ()=> {
             response?: FormErrors | { message: string};
             status:number
         }
-    >=>{
+    > =>{
 
 
         const response = await fetch(`${API_BASE_URL}/applicant/${id}`,{

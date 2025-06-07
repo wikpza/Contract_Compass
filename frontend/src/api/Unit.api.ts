@@ -77,7 +77,7 @@ export const useCreateUnit = ()=>{
             unit?:GetUnitType,
             response?: FormErrors | { message: string};
             status:number
-        }>=>{
+        }> =>{
 
 
         const response = await fetch(`${API_BASE_URL}/unit`,
@@ -132,7 +132,7 @@ export const useUpdateUnit = ()=>{
             unit?:GetUnitType,
             response?: FormErrors | { message: string};
             status:number
-        }>=>{
+        }> =>{
 
         const response = await fetch(`${API_BASE_URL}/unit/${input.id}`,
             {
@@ -186,7 +186,7 @@ export const useDeleteUnit = ()=> {
             response?: FormErrors | { message: string};
             status:number
         }
-    >=>{
+    > =>{
 
 
         const response = await fetch(`${API_BASE_URL}/unit/${id}`,{

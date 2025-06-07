@@ -17,6 +17,9 @@ import {CreateCompanyType, DeleteCompanyType, GetCompanyType, UpdateCompanyType}
 
 export class CompanyRepository implements CompanyRepositoryInterface{
     async createCompany(input: CreateCompanyType): Promise<Company> {
+        const nameExist = await Company.findOne({where:{name:input.name}})
+        if(nameExist) throw new ConflictError('name', {name:['Данное имя уже занято']})
+
         const inputData:CreateCompanyType = {name:""}
 
         if(input.name && input.name !== "") inputData.name = input.name
@@ -118,7 +121,20 @@ export class CompanyRepository implements CompanyRepositoryInterface{
         const companyExist = await Company.findOne({where:{id:input.id}})
         if(!companyExist) throw new NotFoundError('Не найдена Компания', {'id':["Не найдена Компания"]})
 
-        if(input.name && input.name !== "") companyExist.name = input.name
+        if(
+            companyExist.name === input.name &&
+            companyExist.address === input.address &&
+            companyExist.phone === input.phone &&
+            companyExist.email === input.email &&
+            companyExist.note === input.note
+        ) throw new ConflictError('Вы ничего не изменили')
+
+        if(companyExist.name !== input.name){
+            const nameCountExist = await Company.count({where:{name:input.name}})
+            if(nameCountExist > 0) throw new ConflictError('name', {name:['Данное имя уже занято']})
+            companyExist.name = input.name
+        }
+
         if(input.address && input.address !== "") companyExist.address = input.address
         if(input.phone && input.phone !== "") companyExist.phone = input.phone
         if(input.email && input.email !== "") companyExist.email = input.email

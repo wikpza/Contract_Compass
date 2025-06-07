@@ -42,7 +42,7 @@ export const ContractPaymentHistory = ({ payments, contractCurrency }: ContractP
             <TableRow key={payment.id}>
               <TableCell>{formatDate(payment.giveDate)}</TableCell>
               <TableCell className="font-medium">
-                {formatCurrency(payment.amount, payment.currency)}
+                {formatCurrency(payment.amount, payment.currency, payment.currency)}
               </TableCell>
               <TableCell>
                 <Badge variant={payment.type === 'payment' ? 'default' : 'destructive'}>

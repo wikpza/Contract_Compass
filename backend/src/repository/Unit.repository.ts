@@ -95,15 +95,24 @@ export class UnitRepository implements UnitRepositoryInterface{
     async updateUnit(input: UpdateUnitType): Promise<Unit> {
         const unitExisted = await Unit.findOne({where:{id:input.id}})
         if(!unitExisted) throw new NotFoundError('id', {id:["Не была найдена Единица измерения"]})
+        let hasChange = false;
 
-        const unitExistNameCount = await Unit.count({where:{name:input.name}})
-        if(unitExistNameCount > 0 && (unitExisted.name !== input.name)) throw new ConflictError('name', {name:['Такое название уже занято']})
+        if(unitExisted.name !== input.name){
+            const unitExistNameCount = await Unit.count({where:{name:input.name}})
+            if(unitExistNameCount > 0) throw new ConflictError('name', {name:['Такое название уже занято']})
+            unitExisted.name = input.name
+            hasChange = true
+        }
 
-        const unitExistSymbolCount = await Unit.count({where:{symbol:input.symbol}})
-        if(unitExistSymbolCount > 0 && (unitExisted.symbol !== input.symbol)) throw new ConflictError('symbol', {symbol:['Такая аббревиатура уже занята']})
+        if(unitExisted.symbol !== input.symbol){
+            const unitExistSymbolCount = await Unit.count({where:{symbol:input.symbol}})
+            if(unitExistSymbolCount > 0 ) throw new ConflictError('symbol', {symbol:['Такая аббревиатура уже занята']})
+            unitExisted.symbol = input.symbol
+            hasChange = true
+        }
 
-        unitExisted.name = input.name
-        unitExisted.symbol = input.symbol
+        if(!hasChange) throw new ConflictError('Не было внесено изменений')
+
         await unitExisted.save()
         return unitExisted
     }

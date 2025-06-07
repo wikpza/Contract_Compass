@@ -1,4 +1,4 @@
-import {Contract, Purchaser} from "../database/models";
+import {Applicant, Company, Contract, Purchaser} from "../database/models";
 import {Op} from "sequelize";
 import {ConflictError, NotFoundError} from "../utils/error";
 import sequelize from "../database";
@@ -12,6 +12,9 @@ import {CreatePurchaserType, DeletePurchaserType, GetPurchaserType} from "../mod
 export class PurchaserRepository implements PurchaserRepositoryInterface{
     async createPurchaser(input: CreatePurchaserType): Promise<Purchaser> {
         const inputData:CreateApplicantType = {name:""}
+
+        // const nameExist = await Purchaser.findOne({where:{name:input.name}})
+        // if(nameExist) throw new ConflictError('name', {name:['Данное имя уже занято']})
 
         if(input.name && input.name !== "") inputData.name = input.name
         if(input.address && input.address !== "") inputData.address = input.address
@@ -35,7 +38,7 @@ export class PurchaserRepository implements PurchaserRepositoryInterface{
         }
 
         const contractExist = await Contract.findOne({where:{purchaserId:input.id}})
-        if(contractExist) throw new ConflictError('Нельзя удалить, так как данный закупщик участвует в контракте ', contractExist.name)
+        if(contractExist) throw new ConflictError('Нельзя удалить, так как данный закупщик участвует в контракте ')
 
         // 2. Сохраняем копию данных перед удалением
         const deletedApplicant = purchaser.get({ plain: true });
@@ -112,7 +115,20 @@ export class PurchaserRepository implements PurchaserRepositoryInterface{
         const purchaserExist = await Purchaser.findOne({where:{id:input.id}})
         if(!purchaserExist) throw new NotFoundError('Не найден Закупщик', {'id':["Не найден Закупщик"]})
 
-        if(input.name && input.name !== "") purchaserExist.name = input.name
+        if(
+            purchaserExist.name === input.name &&
+            purchaserExist.address === input.address &&
+            purchaserExist.phone === input.phone &&
+            purchaserExist.email === input.email &&
+            purchaserExist.note === input.note
+        ) throw new ConflictError('Вы ничего не изменили')
+
+        if(purchaserExist.name !== input.name){
+            // const nameCountExist = await  Purchaser.count({where:{name:input.name}})
+            // if(nameCountExist > 0) throw new ConflictError('name', {name:['Данное имя уже занято']})
+            purchaserExist.name = input.name
+        }
+
         if(input.address && input.address !== "") purchaserExist.address = input.address
         if(input.phone && input.phone !== "") purchaserExist.phone = input.phone
         if(input.email && input.email !== "") purchaserExist.email = input.email

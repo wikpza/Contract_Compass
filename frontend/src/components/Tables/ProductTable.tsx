@@ -38,6 +38,9 @@ import ApplicantForm from "@/components/Forms/ApplicantForm.tsx";
 import {GetProductType} from "@/types/Product.ts";
 import {useDeleteProduct, useUpdateProduct} from "@/api/Product.api.ts";
 import ProductForm from "@/components/Forms/ProductForm.tsx";
+import {isFormErrors} from "@/lib/errors";
+import {toast} from "sonner";
+import NoteDialog from "@/components/NoteDialog.tsx";
 
 type Props = {
     searchParams:SearchParams,
@@ -136,6 +139,21 @@ export function ProductTable({data, refetch, searchParams, setSearchParams}:Prop
             setOpenDeleteDialogId(null);
         }
     }, [isUpdateSuccess, isDeleteSuccess]);
+
+    useEffect(() => {
+
+        if (deleteResponse && isFormErrors(deleteResponse) && deleteResponse.status && deleteResponse.status >= 400 && deleteResponse.status < 500) {
+            const errorFields = Object.keys(deleteResponse.details)
+            errorFields.forEach(field => {
+                toast.error(deleteResponse.details[field].join(", "));
+            });
+
+            if (errorFields.length === 0) {
+                toast.error(deleteResponse.message);
+            }
+
+        }
+    }, [ deleteResponse]);
 
     return (
         <div className="w-full">
@@ -280,10 +298,7 @@ export function ProductTable({data, refetch, searchParams, setSearchParams}:Prop
                                                 {row.unit.name || 'not unit'}
                                             </TableCell>
 
-                                            <TableCell >
-                                                {row.note || 'not note'}
-                                            </TableCell>
-
+                                            <NoteDialog note={row.note}/>
 
                                             <TableCell >
                                                 {row.createdAt.toString()}

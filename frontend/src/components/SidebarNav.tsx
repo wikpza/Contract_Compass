@@ -35,49 +35,49 @@ export function SidebarNav() {
   const { setOpenMobile } = useSidebar();
   
   const menuItems = [
-    { 
-      path: '/', 
-      name: 'Dashboard', 
-      icon: LayoutDashboard 
-    },
+    // {
+    //   path: '/',
+    //   name: 'Dashboard',
+    //   icon: LayoutDashboard
+    // },
     { 
       path: '/applicants', 
-      name: 'Applicants', 
+      name: "Заявители",
       icon: Users 
     },
     { 
       path: '/purchasers', 
-      name: 'Purchasers', 
+      name: 'Закупщики',
       icon: Users 
     },
     { 
       path: '/companies', 
-      name: 'Companies', 
+      name: 'Фирмы',
       icon: Building2 
     },
     { 
       path: '/products', 
-      name: 'Products', 
+      name: 'Продукты',
       icon: ShoppingBasket 
     },
     { 
       path: '/units', 
-      name: 'Units', 
+      name: 'Единицы измерения',
       icon: Ruler 
     },
     { 
       path: '/projects', 
-      name: 'Projects', 
+      name: 'Проекты',
       icon: Briefcase 
     },
-    { 
-      path: '/links', 
-      name: 'Links', 
-      icon: Link2 
-    },
+    // {
+    //   path: '/links',
+    //   name: 'Links',
+    //   icon: Link2
+    // },
     { 
       path: '/currencies', 
-      name: 'Currencies', 
+      name: 'Валюты',
       icon: CreditCard 
     }
   ];

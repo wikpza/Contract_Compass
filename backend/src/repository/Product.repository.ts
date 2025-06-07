@@ -88,18 +88,29 @@ export class ProductRepository implements ProductRepositoryInterface{
     }
 
     async updateProduct(input: UpdateProductType): Promise<Product> {
-        const unitExist = await Unit.count({where:{id:input.unitId}})
-        if(!unitExist) throw new ConflictError('unitId', {name:['Не была найдена такая единица измерения']})
-
         const productExist = await Product.findOne({where:{id:input.id}})
         if(!productExist) throw new NotFoundError('id', {id:["Не был найден продукт"]})
 
-        const productExistNameCount = await Product.count({where:{name:input.name}})
-        if(productExistNameCount > 0 && (productExist.name !== input.name)) throw new ConflictError('name', {name:['Такое название уже занято']})
+        if(
+            productExist.name === input.name &&
+            productExist.unitId === input.unitId &&
+            productExist.note === input.note
+        ) throw new ConflictError('Вы ничего не изменили')
 
-        productExist.name = input.name
-        productExist.unitId = input.unitId
-        if(input.note) productExist.note = input.note
+        if(productExist.unitId !== input.unitId){
+            const unitExist = await Unit.count({where:{id:input.unitId}})
+            if(!unitExist) throw new ConflictError('unitId', {name:['Не была найдена такая единица измерения']})
+            productExist.unitId = input.unitId
+        }
+
+        if(productExist.name !== input.name){
+            const productExistNameCount = await Product.count({where:{name:input.name}})
+            if(productExistNameCount > 0 && (productExist.name !== input.name)) throw new ConflictError('name', {name:['Такое название уже занято']})
+            productExist.name = input.name
+        }
+
+        if(input.note && input.note !== "") productExist.note = input.note
+
 
         return await productExist.save()
     }

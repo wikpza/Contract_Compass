@@ -45,7 +45,7 @@ router.patch("/:id",
             }
 
             const result = await repository.updateProduct(
-                req.body
+                {...req.body, id}
             )
             return res.status(201).json(result)
         }catch(error){
@@ -115,7 +115,7 @@ router.delete("/:id",
         }catch(error){
             const err = error as BaseError
             logger.error(err)
-            return res.status(err.status).json(JSON.stringify({message:err.message,details:err.details || {}}, null, 2))
+            return res.status(err.status).json({message:err.message,details:err.details || {}})
         }
     })
 

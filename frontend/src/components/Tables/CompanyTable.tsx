@@ -43,6 +43,9 @@ import ApplicantForm from "@/components/Forms/ApplicantForm.tsx";
 import {GetCompanyType} from "@/types/Company.ts";
 import {useDeleteCompany, useUpdateCompany} from "@/api/Company.api.ts";
 import CompanyForm from "@/components/Forms/CompanyForm.tsx";
+import {isFormErrors} from "@/lib/errors";
+import {toast} from "sonner";
+import NoteDialog from "@/components/NoteDialog.tsx";
 
 type Props = {
     searchParams:SearchParams,
@@ -144,6 +147,21 @@ export function CompanyTable({data, refetch, searchParams, setSearchParams}:Prop
         }
     }, [isUpdateSuccess, isDeleteSuccess]);
 
+    useEffect(() => {
+
+        if (deleteResponse && isFormErrors(deleteResponse) && deleteResponse.status && deleteResponse.status >= 400 && deleteResponse.status < 500) {
+            const errorFields = Object.keys(deleteResponse.details)
+            errorFields.forEach(field => {
+                toast.error(deleteResponse.details[field].join(", "));
+            });
+
+            if (errorFields.length === 0) {
+                toast.error(deleteResponse.message);
+            }
+
+        }
+    }, [ deleteResponse]);
+
     return (
         <div className="w-full">
 
@@ -214,9 +232,7 @@ export function CompanyTable({data, refetch, searchParams, setSearchParams}:Prop
                                             {row.address || "not address"}
                                         </TableCell>
 
-                                        <TableCell >
-                                            {row.note || 'not note'}
-                                        </TableCell>
+                                        <NoteDialog note={row.note}/>
 
                                         <TableCell >
                                             {row.phone || 'not phone'}
@@ -249,7 +265,7 @@ export function CompanyTable({data, refetch, searchParams, setSearchParams}:Prop
                                                     <DialogContent className="bg-white text-black">
 
                                                     <DialogHeader>
-                                                            <DialogTitle>Единицы измерения</DialogTitle>
+                                                            <DialogTitle>Компания</DialogTitle>
                                                             <DialogDescription>
                                                                 Обработчик для работы с Компаниями
                                                             </DialogDescription>

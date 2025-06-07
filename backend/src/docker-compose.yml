@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    command: server --address ":9009" /data --console-address ":9010"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9009:9009"  # API порт
+      - "9010:9010"  # Console порт
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+volumes:
+  minio_data:

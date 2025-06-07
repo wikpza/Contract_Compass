@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/dialog.tsx";
 import UnitForm from "@/components/Forms/UnitForm.tsx";
 import SearchPanel from "@/components/SearchPanel.tsx";
+import {isFormErrors} from "@/lib/errors";
+import {toast} from "sonner";
 
 type Props = {
     searchParams:SearchParams,
@@ -129,6 +131,21 @@ export function UnitTable({data, refetch, searchParams, setSearchParams}:Props) 
             setOpenDeleteDialogId(null);
         }
     }, [isUpdateSuccess, isDeleteSuccess]);
+
+    useEffect(() => {
+
+        if (deleteResponse && isFormErrors(deleteResponse) && deleteResponse.status && deleteResponse.status >= 400 && deleteResponse.status < 500) {
+            const errorFields = Object.keys(deleteResponse.details)
+            errorFields.forEach(field => {
+                toast.error(deleteResponse.details[field].join(", "));
+            });
+
+            if (errorFields.length === 0) {
+                toast.error(deleteResponse.message);
+            }
+
+        }
+    }, [ deleteResponse]);
 
     return (
         <div className="w-full">

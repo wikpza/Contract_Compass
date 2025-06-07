@@ -96,7 +96,7 @@ const CompanyForm = ({ data, onCreate, onUpdate, response, onCancel, status }: F
                   <FormItem>
                       <FormLabel>Имя</FormLabel>
                       <FormControl>
-                          <Input {...field} placeholder="Full name" />
+                          <Input {...field} placeholder="Полное имя" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>
@@ -110,7 +110,7 @@ const CompanyForm = ({ data, onCreate, onUpdate, response, onCancel, status }: F
                   <FormItem>
                       <FormLabel>Почта</FormLabel>
                       <FormControl>
-                          <Input {...field} type="email" placeholder="Email address" />
+                          <Input {...field} type="email" placeholder="Почта" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>
@@ -124,7 +124,7 @@ const CompanyForm = ({ data, onCreate, onUpdate, response, onCancel, status }: F
                   <FormItem>
                       <FormLabel>Телефон</FormLabel>
                       <FormControl>
-                          <Input {...field} placeholder="Phone number" />
+                          <Input {...field} placeholder="Номер телефона" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>
@@ -138,7 +138,7 @@ const CompanyForm = ({ data, onCreate, onUpdate, response, onCancel, status }: F
                   <FormItem>
                       <FormLabel>Адресс</FormLabel>
                       <FormControl>
-                          <Input {...field} placeholder="Address" />
+                          <Input {...field} placeholder="Адрес" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>
@@ -152,7 +152,7 @@ const CompanyForm = ({ data, onCreate, onUpdate, response, onCancel, status }: F
                   <FormItem>
                       <FormLabel>Заметка</FormLabel>
                       <FormControl>
-                          <Textarea {...field} placeholder="Additional notes" />
+                          <Textarea {...field} placeholder="Заметка" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>

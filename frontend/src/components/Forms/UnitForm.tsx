@@ -85,7 +85,7 @@ const UnitForm = ({ unit, onCreate, onUpdate, response, onCancel, status }: Unit
             <FormItem>
               <FormLabel>Название</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Unit name" />
+                <Input {...field} placeholder="Название" />
               </FormControl>
               <FormMessage />
             </FormItem>

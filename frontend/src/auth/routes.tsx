@@ -22,7 +22,7 @@ import NotFound from "@/pages/NotFound.tsx";
 export const privateRoutes = [
     {
         path:"/",
-        element:Dashboard
+        element:Projects
     },
     {
         path:"/applicants",
@@ -73,10 +73,10 @@ export const privateRoutes = [
         path:"/units",
         element:Units
     },
-    {
-        path:"/links",
-        element:Links
-    },
+    // {
+    //     path:"/links",
+    //     element:Links
+    // },
 
 
     ]

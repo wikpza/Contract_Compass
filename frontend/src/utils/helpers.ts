@@ -9,13 +9,18 @@ export const formatDate = (date: Date | string): string => {
   });
 };
 
-export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-  }).format(amount);
-};
+export const formatCurrency = (amount: number, currency: string = 'USD', symbol:string): string => {
+  try {
+    // Пытаемся использовать Intl.NumberFormat
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(amount);
+  } catch (error) {
 
+    return `${amount} ${symbol}`
+  }
+};
 export const calculateRemainingBalance = (totalAmount: number, paidAmount: number): number => {
   return totalAmount - paidAmount;
 };

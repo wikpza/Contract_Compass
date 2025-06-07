@@ -1,39 +1,39 @@
 export type GetContractType = {
-    searchBy:string,
-    searchValue:string,
-    page:number,
-    limit:number,
-    sortBy:string,
-    searchType:string
+    searchBy?:string | undefined,
+    searchValue?:string | undefined,
+    page?:number,
+    limit?:number,
+    sortBy?:string | undefined,
+    sortType?:string
+    type?:string
+    projectId?:number
 }
-
-export type CreateContractType = {
-    type:string;
-    name:string,
-    projectId:number,
-    applicantId:number,
-    purchaserId:number,
-    companyId:number,
-    amount:number,
-    currencyId:number,
-    signDate:Date,
-    officialBeginDate:Date,
-    officialFinishDate:Date,
-
-
-    giveAmount?:number,
-    transferCurrencyId?:number,
-    transferCurrencyExchangeRate?:number,
-    projectCurrencyExchangeRate?:number,
-    note?:string
-
-    // finishDate:Date,
-    // status:Date
-}
-
 
 export type DeleteContractType = {
     id:number
 }
+type BaseContractType =   {
+    name:string,
+    type:string;
+    projectId:number,
+    applicantId:number,
+    purchaserId:number,
+    companyId:number,
 
-export type UpdateContractType = CreateContractType & DeleteContractType
+    amount:number,
+    currencyId:number,
+    signDate:string,
+    officialBeginDate:string,
+    officialFinishDate:string,
+
+
+    // giveAmount?:number,
+    // transferCurrencyId?:number,
+    // transferCurrencyExchangeRate?:number,
+    projectCurrencyExchangeRate?:number,
+    note?:string
+}
+
+
+export type CreateContractType = BaseContractType
+export type UpdateContractType = BaseContractType & DeleteContractType

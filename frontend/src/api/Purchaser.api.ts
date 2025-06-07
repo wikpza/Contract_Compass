@@ -3,6 +3,7 @@ import {toast} from "sonner";
 import {FormErrors, handleServerError, isFormErrors, isValidJSON} from "@/lib/errors";
 import {SearchParams} from "@/types";
 import {CreatePurchaserType, GetPurchaserType, UpdatePurchaserType} from "@/types/Purchaser.ts";
+import {CreateApplicantType} from "@/types/Applicant.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export const useGetPurchasers = (
@@ -76,7 +77,7 @@ export const useCreatePurchaser = ()=>{
             unit?:GetPurchaserType,
             response?: FormErrors | { message: string};
             status:number
-        }>=>{
+        }> =>{
 
         const inputData:CreatePurchaserType = {name:""}
 
@@ -138,7 +139,15 @@ export const useUpdatePurchaser = ()=>{
             unit?:GetPurchaserType,
             response?: FormErrors | { message: string};
             status:number
-        }>=>{
+        }> =>{
+
+        const inputData:CreatePurchaserType = {name:""}
+
+        if(input.name && input.name !== "") inputData.name = input.name
+        if(input.address && input.address !== "") inputData.address = input.address
+        if(input.phone && input.phone !== "") inputData.phone = input.phone
+        if(input.email && input.email !== "") inputData.email = input.email
+        if(input.note && input.note !== "") inputData.note = input.note
 
         const response = await fetch(`${API_BASE_URL}/purchaser/${input.id}`,
             {
@@ -147,7 +156,7 @@ export const useUpdatePurchaser = ()=>{
                     "Content-Type": "application/json",
                     Authorization:`Bearer ${accessToken}`,
                 },
-                body:JSON.stringify(input)
+                body:JSON.stringify(inputData)
             })
 
 
@@ -192,7 +201,7 @@ export const useDeletePurchaser = ()=> {
             response?: FormErrors | { message: string};
             status:number
         }
-    >=>{
+    > =>{
 
 
         const response = await fetch(`${API_BASE_URL}/purchaser/${id}`,{

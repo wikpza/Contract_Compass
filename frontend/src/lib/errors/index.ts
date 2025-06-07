@@ -8,19 +8,47 @@ export type FormErrors = {
 
 };
 export function isFormErrors(obj: unknown): obj is FormErrors {
-    return (
-        typeof obj === 'object' &&
-        obj !== null &&
-        'message' in obj &&
-        typeof (obj as { message: unknown }).message === 'string' &&
-        'details' in obj &&
-        typeof (obj as { details: unknown }).details === 'object' &&
-        obj.details !== null &&
-        Object.keys((obj as { details: { [key: string]: string[] } }).details).every((key) => {
-            const value = (obj as { details: { [key: string]: string[] } }).details[key];
-            return Array.isArray(value) && value.every(item => typeof item === 'string');
-        })
+    if (typeof obj !== 'object' || obj === null) {
+        console.log('❌ Не объект или null', obj);
+        return false;
+    }
+
+    if (!('message' in obj)) {
+        console.log('❌ Нет message');
+        return false;
+    }
+
+    if (typeof (obj as { message: unknown }).message !== 'string') {
+        console.log('❌ message не строка');
+        return false;
+    }
+
+    if (!('details' in obj)) {
+        console.log('❌ Нет details');
+        return false;
+    }
+
+    const details = (obj as { details: unknown }).details;
+
+    if (
+        typeof details !== 'object' ||
+        details === null ||
+        Array.isArray(details)
+    ) {
+        console.log('❌ details не объект или null/массив', details);
+        return false;
+    }
+
+    const values = Object.values(details as Record<string, unknown>);
+    const valid = values.every((value) =>
+        Array.isArray(value) && value.every((item) => typeof item === 'string')
     );
+
+    if (!valid) {
+        console.log('❌ Внутри details есть не массив строк', values);
+    }
+
+    return valid;
 }
 
 export const handleServerError = (error: { status: number;}) => {

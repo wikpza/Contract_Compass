@@ -79,9 +79,7 @@ const ProductForm = ({ data:productData, onCreate, onUpdate, response, onCancel,
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
-        if (e.target.value === "") {
-            form.setValue('unitId', 0);
-        }
+        setSearchParams({...searchParams, searchValue:e.target.value})
         setShowOptions(true);
     };
 
@@ -124,7 +122,7 @@ const ProductForm = ({ data:productData, onCreate, onUpdate, response, onCancel,
                         <FormItem>
                             <FormLabel>Имя</FormLabel>
                             <FormControl>
-                                <Input {...field} placeholder="Full name" />
+                                <Input {...field} placeholder="Название товара" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -150,7 +148,7 @@ const ProductForm = ({ data:productData, onCreate, onUpdate, response, onCancel,
                                             className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                             onClick={() => handleUnitSelect(unit.id, unit.name)}
                                         >
-                                            {unit.name}
+                                            {`ID - ${unit.id}, ${unit.name}`}
                                         </div>
                                     ))}
                                 </div>
@@ -170,7 +168,7 @@ const ProductForm = ({ data:productData, onCreate, onUpdate, response, onCancel,
                         <FormItem>
                             <FormLabel>Заметка</FormLabel>
                             <FormControl>
-                                <Textarea {...field} placeholder="Additional notes" />
+                                <Textarea {...field} placeholder="Заметка" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

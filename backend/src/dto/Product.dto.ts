@@ -11,7 +11,6 @@ export class CreateProductRequest {
     @MaxLength(1000, { message: 'Note must be shorter than or equal to 1000 characters' })
     note?: string;
 
-
     @IsInt()
     @Min(0, {message:"id must be greater or equal than 0"})
     unitId!:number

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
 
-import {CreateUnitType, GetUnitType, UpdateUnitType} from "@/types/Unit.ts";
 import {FormErrors, isFormErrors} from "@/lib/errors";
 import {toast} from "sonner";
 import {CreateApplicantType, GetApplicantType, UpdateApplicantType} from "@/types/Applicant.ts";
@@ -44,7 +43,7 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: data?.name || '',
-        email:data?.email || "",
+        email:data?.email || '',
         phone:data?.phone || "",
         address:data?.address || "",
         note:data?.note || "",
@@ -95,7 +94,7 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
                   <FormItem>
                       <FormLabel>Имя</FormLabel>
                       <FormControl>
-                          <Input {...field} placeholder="Full name" />
+                          <Input {...field} placeholder="Полное имя" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>
@@ -109,7 +108,7 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
                   <FormItem>
                       <FormLabel>Почта</FormLabel>
                       <FormControl>
-                          <Input {...field} type="email" placeholder="Email address" />
+                          <Input {...field} type="email" placeholder="Почта" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>
@@ -123,7 +122,7 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
                   <FormItem>
                       <FormLabel>Телефон</FormLabel>
                       <FormControl>
-                          <Input {...field} placeholder="Phone number" />
+                          <Input {...field} placeholder="Номер телефона" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>
@@ -137,7 +136,7 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
                   <FormItem>
                       <FormLabel>Адресс</FormLabel>
                       <FormControl>
-                          <Input {...field} placeholder="Address" />
+                          <Input {...field} placeholder="Адрес" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>
@@ -151,7 +150,7 @@ const ApplicantForm = ({ data, onCreate, onUpdate, response, onCancel, status }:
                   <FormItem>
                       <FormLabel>Заметка</FormLabel>
                       <FormControl>
-                          <Textarea {...field} placeholder="Additional notes" />
+                          <Textarea {...field} placeholder="Заметка" />
                       </FormControl>
                       <FormMessage />
                   </FormItem>

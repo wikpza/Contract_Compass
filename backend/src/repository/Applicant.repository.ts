@@ -1,6 +1,6 @@
 import {UnitRepositoryInterface} from "../interface/Unite.repository.interface";
 import {CreateUnitType, DeleteUnitType, GetUnitType, UpdateUnitType} from "../models/unit.model";
-import {Applicant, Contract, Unit} from "../database/models";
+import {Applicant, Company, Contract, Unit} from "../database/models";
 import {Op, Order} from "sequelize";
 import {ConflictError, NotFoundError} from "../utils/error";
 import sequelize from "../database";
@@ -15,6 +15,9 @@ import ApplicantApi from "../api/Applicant.api";
 
 export class ApplicantRepository implements ApplicantRepositoryInterface{
     async createApplicant(input: CreateApplicantType): Promise<Applicant> {
+        // const nameExist = await Applicant.findOne({where:{name:input.name}})
+        // if(nameExist) throw new ConflictError('name', {name:['Данное имя уже занято']})
+
         const inputData:CreateApplicantType = {name:""}
 
         if(input.name && input.name !== "") inputData.name = input.name
@@ -117,7 +120,19 @@ export class ApplicantRepository implements ApplicantRepositoryInterface{
         const applicantExist = await Applicant.findOne({where:{id:input.id}})
         if(!applicantExist) throw new NotFoundError('Не найден Заявитель', {'id':["Не найден Заявитель"]})
 
-        if(input.name && input.name !== "") applicantExist.name = input.name
+        if(
+            applicantExist.name === input.name &&
+        applicantExist.address === input.address &&
+            applicantExist.phone === input.phone &&
+            applicantExist.email === input.email &&
+            applicantExist.note === input.note
+        ) throw new ConflictError('Вы ничего не изменили')
+
+        if(applicantExist.name !== input.name){
+            // const nameCountExist = await Applicant.count({where:{name:input.name}})
+            // if(nameCountExist > 0) throw new ConflictError('name', {name:['Данное имя уже занято']})
+            applicantExist.name = input.name
+        }
         if(input.address && input.address !== "") applicantExist.address = input.address
         if(input.phone && input.phone !== "") applicantExist.phone = input.phone
         if(input.email && input.email !== "") applicantExist.email = input.email

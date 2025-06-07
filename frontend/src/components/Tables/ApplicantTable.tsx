@@ -35,6 +35,9 @@ import {GetApplicantType} from "@/types/Applicant.ts";
 import SearchPanel from "@/components/SearchPanel.tsx";
 import {useDeleteApplicant, useUpdateApplicant} from "@/api/Applicant.api.ts";
 import ApplicantForm from "@/components/Forms/ApplicantForm.tsx";
+import NoteDialog from "@/components/NoteDialog.tsx";
+import {isFormErrors} from "@/lib/errors";
+import {toast} from "sonner";
 
 type Props = {
     searchParams:SearchParams,
@@ -59,6 +62,7 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
 
     const [openDialogId, setOpenDialogId] = useState<number | null>(null);
     const [openDeleteDialogId, setOpenDeleteDialogId] = useState<number | null>(null);
+
     const getPageLinks = () => {
         const pages = [];
 
@@ -136,6 +140,21 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
         }
     }, [isUpdateSuccess, isDeleteSuccess]);
 
+    useEffect(() => {
+        if (deleteResponse && isFormErrors(deleteResponse) && deleteResponse.status && deleteResponse.status >= 400 && deleteResponse.status < 500) {
+            const errorFields = Object.keys(deleteResponse.details)
+
+            errorFields.forEach(field => {
+                toast.error(deleteResponse.details[field].join(", "));
+            });
+
+            if (errorFields.length === 0) {
+                toast.error(deleteResponse.message);
+            }
+
+        }
+    }, [ deleteResponse]);
+
     return (
         <div className="w-full">
             <ScrollArea className=" w-full rounded-md border p-4">
@@ -207,9 +226,7 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                 {row.address || "not address"}
                                             </TableCell>
 
-                                            <TableCell >
-                                                {row.note || 'not note'}
-                                            </TableCell>
+                                           <NoteDialog note={row.note}/>
 
                                             <TableCell >
                                                 {row.phone || 'not phone'}
@@ -248,7 +265,11 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                                 </DialogDescription>
                                                             </DialogHeader>
                                                             <div>
-                                                                <ApplicantForm response={updateResponse?.response} onCancel={() => setOpenDialogId(null)}  status={updateResponse?.status} onUpdate={update} data={row}/>
+                                                                <ApplicantForm
+                                                                    response={updateResponse?.response}
+                                                                    onCancel={() => setOpenDialogId(null)}
+                                                                    status={updateResponse?.status}
+                                                                    onUpdate={update} data={row}/>
                                                             </div>
                                                         </DialogContent>
                                                     </Dialog>
@@ -275,7 +296,7 @@ export function ApplicantTable({data, refetch, searchParams, setSearchParams}:Pr
                                                         <DialogContent className="bg-white text-black">
 
                                                             <DialogHeader>
-                                                                <DialogTitle>Единицы измерения</DialogTitle>
+                                                                <DialogTitle>Заявители</DialogTitle>
                                                                 <DialogDescription>
                                                                     {`Вы уверены, что хотите удалить Заявителя ${row.name}?`}
                                                                 </DialogDescription>

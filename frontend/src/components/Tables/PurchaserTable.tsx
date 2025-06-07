@@ -43,6 +43,9 @@ import ApplicantForm from "@/components/Forms/ApplicantForm.tsx";
 import {GetPurchaserType} from "@/types/Purchaser.ts";
 import {useDeletePurchaser, useUpdatePurchaser} from "@/api/Purchaser.api.ts";
 import PurchaserForm from "@/components/Forms/PurchaserForm.tsx";
+import NoteDialog from "@/components/NoteDialog.tsx";
+import {isFormErrors} from "@/lib/errors";
+import {toast} from "sonner";
 
 type Props = {
     searchParams:SearchParams,
@@ -144,6 +147,22 @@ export function PurchaserTable({data, refetch, searchParams, setSearchParams}:Pr
         }
     }, [isUpdateSuccess, isDeleteSuccess]);
 
+
+    useEffect(() => {
+
+        if (deleteResponse && isFormErrors(deleteResponse) && deleteResponse.status && deleteResponse.status >= 400 && deleteResponse.status < 500) {
+            const errorFields = Object.keys(deleteResponse.details)
+            errorFields.forEach(field => {
+                toast.error(deleteResponse.details[field].join(", "));
+            });
+
+            if (errorFields.length === 0) {
+                toast.error(deleteResponse.message);
+            }
+
+        }
+    }, [ deleteResponse]);
+
     return (
         <div className="w-full">
 
@@ -214,9 +233,7 @@ export function PurchaserTable({data, refetch, searchParams, setSearchParams}:Pr
                                             {row.address || "not address"}
                                         </TableCell>
 
-                                        <TableCell >
-                                            {row.note || 'not note'}
-                                        </TableCell>
+                                        <NoteDialog note={row.note}/>
 
                                         <TableCell >
                                             {row.phone || 'not phone'}
@@ -249,9 +266,9 @@ export function PurchaserTable({data, refetch, searchParams, setSearchParams}:Pr
                                                     <DialogContent className="bg-white text-black">
 
                                                     <DialogHeader>
-                                                            <DialogTitle>Единицы измерения</DialogTitle>
+                                                            <DialogTitle>Закупщик</DialogTitle>
                                                             <DialogDescription>
-                                                                Обработчик для работы с единицами измерениями
+                                                                Обработчик для работы с Закупщиками
                                                             </DialogDescription>
                                                         </DialogHeader>
                                                         <div>
@@ -282,9 +299,9 @@ export function PurchaserTable({data, refetch, searchParams, setSearchParams}:Pr
                                                     <DialogContent className="bg-white text-black">
 
                                                         <DialogHeader>
-                                                            <DialogTitle>Единицы измерения</DialogTitle>
+                                                            <DialogTitle>Закупщик</DialogTitle>
                                                             <DialogDescription>
-                                                                {`Вы уверены, что хотите удалить Заказчика ${row.name}?`}
+                                                                {`Вы уверены, что хотите удалить Закупщика ${row.name}?`}
                                                             </DialogDescription>
                                                         </DialogHeader>
 

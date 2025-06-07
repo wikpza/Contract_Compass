@@ -77,7 +77,7 @@ export const useCreateProduct = ()=>{
             unit?:GetProductType,
             response?: FormErrors | { message: string};
             status:number
-        }>=>{
+        }> =>{
 
         const inputData:CreateProductType = {name:input.name, unitId:input.unitId}
 
@@ -135,7 +135,7 @@ export const useUpdateProduct = ()=>{
             unit?:GetProductType,
             response?: FormErrors | { message: string};
             status:number
-        }>=>{
+        }> =>{
 
         const response = await fetch(`${API_BASE_URL}/product/${input.id}`,
             {
@@ -189,7 +189,7 @@ export const useDeleteProduct = ()=> {
             response?: FormErrors | { message: string};
             status:number
         }
-    >=>{
+    > =>{
 
 
         const response = await fetch(`${API_BASE_URL}/product/${id}`,{
