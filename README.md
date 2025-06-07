@@ -69,7 +69,7 @@
 <img src="./images/createApplicant.png" alt="Описание" height="500" />
 
 ### Project
-<img src="./images/project.png" alt="Описание"  height="500" />
+<img src="./images/proejct.png" alt="Описание"  height="500" />
 
 
 ### Project Detail
