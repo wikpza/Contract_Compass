@@ -56,11 +56,34 @@
 ---
 
 ## Classes (diagram)
-![Classes]("./images/classes.png)
+<img src="./images/classes.png"  height="500" />
 
 
-## Classes (diagram)
-<img src="путь_к_изображению.png" alt="Описание" width="200" height="100" />
+## Program pictures
+
+### Applicants
+<img src="./images/applicants.png" alt="Описание" width="200" height="100" />
+
+
+### Create Applicants
+<img src="./images/createApplicant.png" alt="Описание" width="200" height="100" />
+
+### Project
+<img src="./images/project.png" alt="Описание" width="200" height="100" />
+
+
+### Project Detail
+<img src="./images/project_detail.png" alt="Описание" width="200" height="100" />
+
+
+### Contract Detail
+<img src="./images/contract-detail.png" alt="Описание" width="200" height="100" />
+
+### Contract Transactions
+<img src="./images/contract-transaction.png" alt="Описание" width="200" height="100" />
+
+### Contract product
+<img src="./images/contract-products.png" alt="Описание" width="200" height="100" />
 
 ## 📦 Project Structure
 
