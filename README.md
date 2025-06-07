@@ -62,28 +62,28 @@
 ## Program pictures
 
 ### Applicants
-<img src="./images/applicants.png" alt="Описание" width="200" height="100" />
+<img src="./images/applicants.png" alt="Описание"  height="500" />
 
 
 ### Create Applicants
-<img src="./images/createApplicant.png" alt="Описание" width="200" height="100" />
+<img src="./images/createApplicant.png" alt="Описание" height="500" />
 
 ### Project
-<img src="./images/project.png" alt="Описание" width="200" height="100" />
+<img src="./images/project.png" alt="Описание"  height="500" />
 
 
 ### Project Detail
-<img src="./images/project_detail.png" alt="Описание" width="200" height="100" />
+<img src="./images/project_detail.png" alt="Описание"  height="500" />
 
 
 ### Contract Detail
-<img src="./images/contract-detail.png" alt="Описание" width="200" height="100" />
+<img src="./images/contract-detail.png" alt="Описание"  height="500" />
 
 ### Contract Transactions
-<img src="./images/contract-transaction.png" alt="Описание" width="200" height="100" />
+<img src="./images/contract-transaction.png" alt="Описание" height="500" />
 
 ### Contract product
-<img src="./images/contract-products.png" alt="Описание" width="200" height="100" />
+<img src="./images/contract-products.png" alt="Описание"  height="500" />
 
 ## 📦 Project Structure
 
